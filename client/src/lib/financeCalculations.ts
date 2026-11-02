@@ -13,6 +13,8 @@ import { detectRecurringPayments } from './recurringDetection'
 import type { RecurringReviewRecord } from './recurringStorage'
 import { detectSpendingAnomalies } from './anomalyDetection'
 import type { AnomalyReviewRecord } from './anomalyStorage'
+import { detectSavingsOpportunities } from './savingsDetection'
+import type { SavingsReviewRecord } from './savingsStorage'
 
 /**
  * Finora Core Financial Calculation Engine
@@ -217,14 +219,16 @@ export function calculateAnomalySummary(
 
 // Dynamic Anomaly Detection Engine active
 
-export function calculateSavingsSummary(_transactions?: Transaction[]): SavingsSummary {
-  void _transactions
+export function calculateSavingsSummary(
+  transactions: Transaction[] = [],
+  reviews?: Record<string, SavingsReviewRecord>,
+  referenceDateStr?: string
+): SavingsSummary {
+  const result = detectSavingsOpportunities(transactions, reviews, { referenceDateStr })
   const scenarios = DEMO_SAVINGS_SCENARIOS
-  const totalIdentifiedMonthly = scenarios.reduce((sum, s) => sum + s.potentialMonthlySavings, 0)
-
   return {
-    topOpportunity: scenarios[0],
-    totalIdentifiedMonthly,
+    ...result.summary,
     scenarios,
+    totalIdentifiedMonthly: result.summary.totalPotentialMonthly,
   }
 }

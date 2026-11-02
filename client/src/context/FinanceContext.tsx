@@ -5,7 +5,6 @@ import {
   calculateSummaryMetrics,
   calculateCategoryBreakdown,
   calculateSpendingTrend,
-  calculateSavingsSummary,
 } from '../lib/financeCalculations'
 import {
   loadTransactionsFromStorage,
@@ -34,6 +33,17 @@ import {
   clearAnomalyReviews,
   type AnomalyReviewRecord,
 } from '../lib/anomalyStorage'
+import {
+  detectSavingsOpportunities,
+  type SavingsAnalysisResult,
+} from '../lib/savingsDetection'
+import {
+  loadSavingsReviews,
+  saveSavingsReview,
+  removeSavingsReview,
+  clearSavingsReviews,
+  type SavingsReviewRecord,
+} from '../lib/savingsStorage'
 import { FinanceContext } from './financeContextDef'
 import type { FinanceContextType } from './financeContextDef'
 
@@ -54,6 +64,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Anomaly Reviews state initialized from localStorage
   const [anomalyReviews, setAnomalyReviews] = useState<Record<string, AnomalyReviewRecord>>(() =>
     loadAnomalyReviews()
+  )
+
+  // Savings Reviews state initialized from localStorage
+  const [savingsReviews, setSavingsReviews] = useState<Record<string, SavingsReviewRecord>>(() =>
+    loadSavingsReviews()
   )
 
   // 1. CREATE Transaction
@@ -205,7 +220,66 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setAnomalyReviews({})
   }, [])
 
-  // 8. RESET to Demo Dataset
+  // 8. SAVINGS OPPORTUNITY REVIEWS
+  const saveSavingsOpportunity = useCallback((opportunityKey: string) => {
+    const record: SavingsReviewRecord = {
+      opportunityKey,
+      status: 'saved',
+      reviewedAt: new Date().toISOString(),
+    }
+    saveSavingsReview(record)
+    setSavingsReviews((prev) => ({ ...prev, [opportunityKey]: record }))
+  }, [])
+
+  const planSavingsOpportunity = useCallback(
+    (opportunityKey: string, customTarget?: number) => {
+      const record: SavingsReviewRecord = {
+        opportunityKey,
+        status: 'planned',
+        reviewedAt: new Date().toISOString(),
+        customTargetPercent: customTarget,
+      }
+      saveSavingsReview(record)
+      setSavingsReviews((prev) => ({ ...prev, [opportunityKey]: record }))
+    },
+    []
+  )
+
+  const completeSavingsOpportunity = useCallback((opportunityKey: string) => {
+    const record: SavingsReviewRecord = {
+      opportunityKey,
+      status: 'completed',
+      reviewedAt: new Date().toISOString(),
+    }
+    saveSavingsReview(record)
+    setSavingsReviews((prev) => ({ ...prev, [opportunityKey]: record }))
+  }, [])
+
+  const dismissSavingsOpportunity = useCallback((opportunityKey: string) => {
+    const record: SavingsReviewRecord = {
+      opportunityKey,
+      status: 'dismissed',
+      reviewedAt: new Date().toISOString(),
+    }
+    saveSavingsReview(record)
+    setSavingsReviews((prev) => ({ ...prev, [opportunityKey]: record }))
+  }, [])
+
+  const reinstateSavingsOpportunity = useCallback((opportunityKey: string) => {
+    removeSavingsReview(opportunityKey)
+    setSavingsReviews((prev) => {
+      const next = { ...prev }
+      delete next[opportunityKey]
+      return next
+    })
+  }, [])
+
+  const resetSavingsReviews = useCallback(() => {
+    clearSavingsReviews()
+    setSavingsReviews({})
+  }, [])
+
+  // 9. RESET to Demo Dataset
   const resetToDemo = useCallback(() => {
     const fresh = getFreshDemoTransactions()
     setTransactions(fresh)
@@ -214,6 +288,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setRecurringReviews({})
     clearAnomalyReviews()
     setAnomalyReviews({})
+    clearSavingsReviews()
+    setSavingsReviews({})
   }, [])
 
   // Modal helpers
@@ -263,10 +339,21 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const anomalySummary = anomalyAnalysis.summary
 
-  // Synchronized savings summary
-  const savingsSummary = useMemo(() => {
-    return calculateSavingsSummary(transactions)
-  }, [transactions])
+  // Pure deterministic Savings Opportunity Lab engine
+  const savingsAnalysis: SavingsAnalysisResult = useMemo(() => {
+    return detectSavingsOpportunities(transactions, savingsReviews, {
+      recurringCandidates: recurringAnalysis.activeCandidates,
+      anomalyFindings: anomalyAnalysis.activeFindings,
+    })
+  }, [
+    transactions,
+    savingsReviews,
+    recurringAnalysis.activeCandidates,
+    anomalyAnalysis.activeFindings,
+  ])
+
+  const savingsSummary = savingsAnalysis.summary
+  const savingsOpportunities = savingsAnalysis.allOpportunities
 
   const value: FinanceContextType = {
     transactions,
@@ -295,6 +382,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     reinstateAnomalyFinding,
     resetAnomalyReviews,
     savingsSummary,
+    savingsAnalysis,
+    savingsOpportunities,
+    saveSavingsOpportunity,
+    planSavingsOpportunity,
+    completeSavingsOpportunity,
+    dismissSavingsOpportunity,
+    reinstateSavingsOpportunity,
+    resetSavingsReviews,
     isAddTxModalOpen,
     editingTransaction,
     openAddTxModal,

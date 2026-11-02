@@ -11,6 +11,8 @@ import type {
 } from '../types/finance'
 import type { RecurringAnalysisResult } from '../lib/recurringDetection'
 import type { AnomalyAnalysisResult } from '../lib/anomalyDetection'
+import type { SavingsAnalysisResult } from '../lib/savingsDetection'
+import type { SavingsOpportunity } from '../types/finance'
 
 export interface FinanceContextType {
   transactions: Transaction[]
@@ -39,6 +41,14 @@ export interface FinanceContextType {
   reinstateAnomalyFinding: (findingKey: string) => void
   resetAnomalyReviews: () => void
   savingsSummary: SavingsSummary
+  savingsAnalysis: SavingsAnalysisResult
+  savingsOpportunities: SavingsOpportunity[]
+  saveSavingsOpportunity: (opportunityKey: string) => void
+  planSavingsOpportunity: (opportunityKey: string, customTarget?: number) => void
+  completeSavingsOpportunity: (opportunityKey: string) => void
+  dismissSavingsOpportunity: (opportunityKey: string) => void
+  reinstateSavingsOpportunity: (opportunityKey: string) => void
+  resetSavingsReviews: () => void
   isAddTxModalOpen: boolean
   editingTransaction: Transaction | null
   openAddTxModal: () => void

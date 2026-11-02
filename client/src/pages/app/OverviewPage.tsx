@@ -236,11 +236,11 @@ export const OverviewPage: React.FC = () => {
             </div>
             <div className="mt-3">
               <div className="text-2xl lg:text-3xl font-serif font-medium text-[#16201B] tracking-tight">
-                {formatCurrency(metrics.potentialMonthlySavings)}
+                {formatCurrency(savingsSummary.totalPotentialMonthly ?? metrics.potentialMonthlySavings)}
                 <span className="text-xs font-mono font-normal text-[#788780] ml-1">/mo</span>
               </div>
               <div className="mt-1 flex items-center gap-1 text-[11px] text-[#2D6A4F] font-medium">
-                <span className="font-mono">3 eligible opportunities</span>
+                <span className="font-mono">{savingsSummary.activeCount} active opportunities</span>
               </div>
             </div>
           </div>
@@ -631,10 +631,10 @@ export const OverviewPage: React.FC = () => {
               </p>
               <div className="mt-4 p-3 rounded-xl bg-[#F2F7F4] border border-[#C2D3CC]">
                 <div className="text-[11px] font-mono text-[#2D6A4F]">
-                  Top Opportunity: {savingsSummary.topOpportunity.category}
+                  Top Opportunity: {savingsSummary.topOpportunity ? savingsSummary.topOpportunity.category : 'All clear'}
                 </div>
                 <div className="text-lg font-serif font-medium text-[#16201B] mt-0.5">
-                  +{formatCurrency(savingsSummary.topOpportunity.potentialMonthlySavings)}
+                  +{formatCurrency(savingsSummary.topOpportunity ? savingsSummary.topOpportunity.potentialMonthlySavings : 0)}
                   <span className="text-xs font-mono font-normal text-[#788780] ml-1">/mo</span>
                 </div>
               </div>

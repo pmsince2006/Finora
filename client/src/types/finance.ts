@@ -170,8 +170,56 @@ export interface SavingsScenario {
   impact: 'High' | 'Moderate'
 }
 
+export type SavingsOpportunityType =
+  | 'recurring_review'
+  | 'discretionary_trim'
+  | 'merchant_concentration'
+  | 'anomaly_remediation'
+
+export type SavingsEvidenceQuality = 'high' | 'moderate' | 'preliminary'
+
+export type SavingsOpportunityStatus =
+  | 'suggested'
+  | 'saved'
+  | 'planned'
+  | 'completed'
+  | 'dismissed'
+
+export interface SavingsOpportunity {
+  id: string
+  opportunityKey: string
+  title: string
+  description: string
+  type: SavingsOpportunityType
+  category: string
+  potentialMonthlySavings: number
+  potentialAnnualSavings: number
+  timeBasis: 'monthly' | 'annual'
+  evidenceQuality: SavingsEvidenceQuality
+  explanation: string
+  calculationMethod: string
+  recommendedAction: string
+  status: SavingsOpportunityStatus
+  reviewedAt?: string
+  plannedTargetAmount?: number
+  sourceId?: string
+  sourceRecordCount?: number
+  currentMonthlySpend?: number
+  targetReductionPercent?: number
+  userNotes?: string
+}
+
 export interface SavingsSummary {
-  topOpportunity: SavingsScenario
-  totalIdentifiedMonthly: number
-  scenarios: SavingsScenario[]
+  activeCount: number
+  plannedCount: number
+  completedCount: number
+  dismissedCount: number
+  totalPotentialMonthly: number
+  totalPotentialAnnual: number
+  plannedMonthlySavings: number
+  opportunities: SavingsOpportunity[]
+  topOpportunity?: SavingsOpportunity
+  // Backwards compatibility for legacy components
+  totalIdentifiedMonthly?: number
+  scenarios?: SavingsScenario[]
 }
