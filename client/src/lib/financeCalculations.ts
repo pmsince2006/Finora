@@ -9,7 +9,9 @@ import type {
   SavingsSummary,
   AnomalyFinding,
 } from '../types/finance'
-import { DEMO_RECURRING_CANDIDATES, DEMO_SAVINGS_SCENARIOS } from '../data/demoTransactions'
+import { DEMO_SAVINGS_SCENARIOS } from '../data/demoTransactions'
+import { detectRecurringPayments } from './recurringDetection'
+import type { RecurringReviewRecord } from './recurringStorage'
 
 /**
  * Finora Core Financial Calculation Engine
@@ -196,25 +198,12 @@ export function calculateSpendingTrend(
   })
 }
 
-export function calculateRecurringSummary(transactions: Transaction[]): RecurringSummary {
-  // Use candidates present in transactions or fallback to verified candidates
-  const recurringTxs = transactions.filter((t) => t.isRecurringCandidate || t.status === 'recurring')
-  
-  // Reconcile with verified candidates list
-  const candidates = DEMO_RECURRING_CANDIDATES
-  const monthlyCommitment = candidates.reduce((sum, c) => {
-    if (c.cadence === 'Monthly') return sum + c.amount
-    if (c.cadence === 'Weekly') return sum + c.amount * 4.33
-    if (c.cadence === 'Annual') return sum + c.amount / 12
-    return sum + c.amount
-  }, 0)
-
-  return {
-    candidateCount: Math.max(candidates.length, recurringTxs.length),
-    monthlyCommitment: Math.round(monthlyCommitment),
-    annualCommitment: Math.round(monthlyCommitment * 12),
-    candidates,
-  }
+export function calculateRecurringSummary(
+  transactions: Transaction[],
+  reviews?: Record<string, RecurringReviewRecord>
+): RecurringSummary {
+  const analysis = detectRecurringPayments(transactions, reviews)
+  return analysis.summary
 }
 
 export function calculateAnomalySummary(transactions: Transaction[]): AnomalySummary {
@@ -246,6 +235,7 @@ export function calculateAnomalySummary(transactions: Transaction[]): AnomalySum
 }
 
 export function calculateSavingsSummary(_transactions?: Transaction[]): SavingsSummary {
+  void _transactions
   const scenarios = DEMO_SAVINGS_SCENARIOS
   const totalIdentifiedMonthly = scenarios.reduce((sum, s) => sum + s.potentialMonthlySavings, 0)
 

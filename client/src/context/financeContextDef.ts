@@ -9,6 +9,7 @@ import type {
   AnomalySummary,
   SavingsSummary,
 } from '../types/finance'
+import type { RecurringAnalysisResult } from '../lib/recurringDetection'
 
 export interface FinanceContextType {
   transactions: Transaction[]
@@ -25,6 +26,11 @@ export interface FinanceContextType {
   categoryBreakdown: CategoryBreakdown[]
   trendData: SpendingTrendPoint[]
   recurringSummary: RecurringSummary
+  recurringAnalysis: RecurringAnalysisResult
+  confirmRecurringCandidate: (candidateKey: string) => void
+  dismissRecurringCandidate: (candidateKey: string) => void
+  reinstateRecurringCandidate: (candidateKey: string) => void
+  resetRecurringReviews: () => void
   anomalySummary: AnomalySummary
   savingsSummary: SavingsSummary
   isAddTxModalOpen: boolean

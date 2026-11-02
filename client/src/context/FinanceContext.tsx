@@ -5,7 +5,6 @@ import {
   calculateSummaryMetrics,
   calculateCategoryBreakdown,
   calculateSpendingTrend,
-  calculateRecurringSummary,
   calculateAnomalySummary,
   calculateSavingsSummary,
 } from '../lib/financeCalculations'
@@ -14,6 +13,17 @@ import {
   saveTransactionsToStorage,
   getFreshDemoTransactions,
 } from '../lib/transactionStorage'
+import {
+  detectRecurringPayments,
+  type RecurringAnalysisResult,
+} from '../lib/recurringDetection'
+import {
+  loadRecurringReviews,
+  saveRecurringReview,
+  removeRecurringReview,
+  clearRecurringReviews,
+  type RecurringReviewRecord,
+} from '../lib/recurringStorage'
 import { FinanceContext } from './financeContextDef'
 import type { FinanceContextType } from './financeContextDef'
 
@@ -25,6 +35,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isAddTxModalOpen, setIsAddTxModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+
+  // Recurring Reviews state initialized from localStorage
+  const [recurringReviews, setRecurringReviews] = useState<Record<string, RecurringReviewRecord>>(() =>
+    loadRecurringReviews()
+  )
 
   // 1. CREATE Transaction
   const addTransaction = useCallback((newTx: Omit<Transaction, 'id'>): Transaction => {
@@ -103,11 +118,48 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return { importedCount: createdList.length }
   }, [])
 
-  // 6. RESET to Demo Dataset
+  // 6. RECURRING CANDIDATE REVIEWS
+  const confirmRecurringCandidate = useCallback((candidateKey: string) => {
+    const record: RecurringReviewRecord = {
+      candidateKey,
+      status: 'confirmed',
+      reviewedAt: new Date().toISOString(),
+    }
+    saveRecurringReview(record)
+    setRecurringReviews((prev) => ({ ...prev, [candidateKey]: record }))
+  }, [])
+
+  const dismissRecurringCandidate = useCallback((candidateKey: string) => {
+    const record: RecurringReviewRecord = {
+      candidateKey,
+      status: 'dismissed',
+      reviewedAt: new Date().toISOString(),
+    }
+    saveRecurringReview(record)
+    setRecurringReviews((prev) => ({ ...prev, [candidateKey]: record }))
+  }, [])
+
+  const reinstateRecurringCandidate = useCallback((candidateKey: string) => {
+    removeRecurringReview(candidateKey)
+    setRecurringReviews((prev) => {
+      const next = { ...prev }
+      delete next[candidateKey]
+      return next
+    })
+  }, [])
+
+  const resetRecurringReviews = useCallback(() => {
+    clearRecurringReviews()
+    setRecurringReviews({})
+  }, [])
+
+  // 7. RESET to Demo Dataset
   const resetToDemo = useCallback(() => {
     const fresh = getFreshDemoTransactions()
     setTransactions(fresh)
     saveTransactionsToStorage(fresh)
+    clearRecurringReviews()
+    setRecurringReviews({})
   }, [])
 
   // Modal helpers
@@ -143,15 +195,18 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return calculateSpendingTrend(filteredTransactions, period)
   }, [filteredTransactions, period])
 
-  const recurringSummary = useMemo(() => {
-    return calculateRecurringSummary(transactions)
-  }, [transactions])
+  // Pure deterministic Recurring Payment Detective engine
+  const recurringAnalysis: RecurringAnalysisResult = useMemo(() => {
+    return detectRecurringPayments(transactions, recurringReviews)
+  }, [transactions, recurringReviews])
+
+  const recurringSummary = recurringAnalysis.summary
 
   const anomalySummary = useMemo(() => {
     return calculateAnomalySummary(transactions)
   }, [transactions])
 
-  // Synchronized savings summary (no empty dependency array bug)
+  // Synchronized savings summary
   const savingsSummary = useMemo(() => {
     return calculateSavingsSummary(transactions)
   }, [transactions])
@@ -171,6 +226,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     categoryBreakdown,
     trendData,
     recurringSummary,
+    recurringAnalysis,
+    confirmRecurringCandidate,
+    dismissRecurringCandidate,
+    reinstateRecurringCandidate,
+    resetRecurringReviews,
     anomalySummary,
     savingsSummary,
     isAddTxModalOpen,

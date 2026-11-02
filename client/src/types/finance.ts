@@ -4,7 +4,20 @@ export type TransactionStatus = 'verified' | 'flagged' | 'recurring' | 'regular'
 
 export type AnomalySeverity = 'low' | 'medium' | 'high'
 
-export type RecurringCadence = 'Weekly' | 'Monthly' | 'Annual'
+export type RecurringCadence =
+  | 'Weekly'
+  | 'Fortnightly'
+  | 'Monthly'
+  | 'Quarterly'
+  | 'Annually'
+  | 'Irregular / Uncertain'
+  | 'Annual'
+
+export type ReviewStatus = 'suggested' | 'confirmed' | 'dismissed'
+
+export type AmountVariability = 'exact' | 'low' | 'moderate' | 'high'
+
+export type CadenceConsistency = 'regular' | 'moderate' | 'irregular'
 
 export interface Transaction {
   id: string
@@ -52,16 +65,34 @@ export interface SpendingTrendPoint {
   net: number
 }
 
+export interface UpcomingCharge {
+  merchant: string
+  date: string
+  amount: number
+  cadence: RecurringCadence
+}
+
 export interface RecurringCandidate {
   id: string
+  candidateKey: string
   merchant: string
   category: string
   amount: number
   cadence: RecurringCadence
   confidence: number
   lastBilled: string
-  nextExpected: string
-  status: 'Candidate' | 'Confirmed'
+  nextExpected: string | null
+  status: 'Candidate' | 'Confirmed' | 'Dismissed'
+  occurrenceCount: number
+  matchingTransactionIds: string[]
+  averageAmount: number
+  monthlyEquivalent: number
+  annualEquivalent: number
+  amountVariability: AmountVariability
+  cadenceConsistency: CadenceConsistency
+  explanation: string
+  reviewStatus: ReviewStatus
+  reviewedAt?: string
 }
 
 export interface RecurringSummary {
@@ -69,6 +100,13 @@ export interface RecurringSummary {
   monthlyCommitment: number
   annualCommitment: number
   candidates: RecurringCandidate[]
+  upcomingCharges30Days?: UpcomingCharge[]
+  reviewStats?: {
+    totalDetected: number
+    suggestedCount: number
+    confirmedCount: number
+    dismissedCount: number
+  }
 }
 
 export interface AnomalyFinding {
