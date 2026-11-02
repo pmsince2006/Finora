@@ -6,48 +6,48 @@ export const HowItWorks: React.FC = () => {
   const steps = [
     {
       number: '01',
-      title: 'Import Transactions',
-      subtitle: 'Canonical Data Ingestion',
+      title: 'Add your transactions',
+      subtitle: 'Simple, private imports',
       description:
-        'Upload standard CSV exports from any financial institution or student account. Column mapping auto-detects dates, descriptions, and amounts with SHA-256 fingerprint deduplication.',
+        'Import a transaction CSV file from your bank or enter your income and expenses manually. Duplicate rows are checked automatically so nothing is counted twice.',
       features: [
-        'Local CSV parsing with privacy protection',
-        'Auto-column detection & header normalization',
-        'Duplicate rejection & integer-cent precision',
+        'Works with standard CSV exports',
+        'Automatic column and header detection',
+        'Prevents duplicate transactions',
       ],
       icon: FileUp,
       accentColor: 'text-[#1B4332]',
-      tag: 'INGESTION ENGINE',
+      tag: 'STEP 1',
     },
     {
       number: '02',
-      title: 'Investigate Patterns',
-      subtitle: 'Rule-Based Pattern Detection',
+      title: 'Find spending patterns',
+      subtitle: 'Repeated bills & unusual purchases',
       description:
-        'Deterministic algorithms scan your history for regular billing intervals, amount drift, and statistical outliers against rolling 60-day category averages with complete mathematical explainability.',
+        'SpendSleuth reviews your history to spot payments that repeat on a regular schedule and highlights purchases that look higher than your typical average.',
       features: [
-        'Cadence clustering (weekly, monthly, annual)',
-        'Outlier z-score & spending velocity alerts',
-        'Plain-language evidence drawers for every finding',
+        'Finds weekly, monthly, and annual bills',
+        'Flags purchases that are unusually high',
+        'Clear, plain-English reasons for every finding',
       ],
       icon: SearchCheck,
       accentColor: 'text-[#52796F]',
-      tag: 'FORENSIC DETECTIVE',
+      tag: 'STEP 2',
     },
     {
       number: '03',
-      title: 'Discover Potential Savings',
-      subtitle: 'Scenario Simulation & Action',
+      title: 'Explore ways to save',
+      subtitle: 'Realistic monthly targets',
       description:
-        'Turn investigative findings directly into tangible capital. Run what-if simulations on discretionary spending and unneeded subscriptions to commit to realistic, milestone-tracked savings goals.',
+        'Try different monthly spending limits and see how much you could save over 6 months and a full year. Save your scenario to track progress as you add new transactions.',
       features: [
-        'Interactive category reduction sliders',
-        'Subscription cancellation yield forecasts',
-        'Direct linkage between anomalies and saved goals',
+        'Simple sliders to adjust flexible spending',
+        'See how canceling unneeded subscriptions adds up',
+        'Turn findings directly into saved goals',
       ],
       icon: PiggyBank,
       accentColor: 'text-[#2D6A4F]',
-      tag: 'OPPORTUNITY LAB',
+      tag: 'STEP 3',
     },
   ]
 
@@ -59,17 +59,17 @@ export const HowItWorks: React.FC = () => {
           <div className="flex items-center gap-2 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#153326]" />
             <span className="font-mono text-xs text-[#52796F] uppercase tracking-wider">
-              Forensic Workflow
+              HOW IT WORKS
             </span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-sans font-medium tracking-tight text-[#0C120F]">
-            How raw transactions become{' '}
+            From bank statements to{' '}
             <span className="font-serif italic font-normal text-[#153326]">
-              actionable capital.
+              clear monthly savings.
             </span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-[#4B5952] leading-relaxed">
-            SpendSleuth bridges the gap between passive bank statements and proactive wealth-building through a continuous three-stage investigative loop.
+            SpendSleuth turns your everyday purchases into simple, actionable insights in three easy steps.
           </p>
         </div>
 
@@ -126,7 +126,7 @@ export const HowItWorks: React.FC = () => {
 
                 {/* Bottom Step Indicator */}
                 <div className="mt-8 pt-4 border-t border-[#E6E6DF] flex items-center justify-between text-[11px] font-mono text-[#788780]">
-                  <span>STAGE {step.number} OF 03</span>
+                  <span>STEP {step.number} OF 3</span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#52796F] group-hover:translate-x-1 transition-transform" />
                 </div>
               </motion.div>

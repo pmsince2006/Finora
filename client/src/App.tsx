@@ -1,6 +1,8 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { LandingPage } from './pages/LandingPage'
+import { LoginPage } from './pages/LoginPage'
+import { RegisterPage } from './pages/RegisterPage'
 import { AppLayout } from './components/app/AppLayout'
 import { OverviewPage } from './pages/app/OverviewPage'
 import { TransactionsPage } from './pages/app/TransactionsPage'
@@ -17,6 +19,10 @@ export const App: React.FC = () => {
       <Routes>
         {/* Phase 01 Preserved Public Landing Page */}
         <Route path="/" element={<LandingPage />} />
+
+        {/* Dedicated Dark Authentication Pages */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* Phase 02 Authenticated-Style Application Workspace */}
         <Route

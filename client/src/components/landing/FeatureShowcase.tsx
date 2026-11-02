@@ -9,74 +9,78 @@ import {
   Check,
   ChevronRight,
 } from 'lucide-react'
+import { formatCurrency } from '../../lib/formatCurrency'
 
 export const FeatureShowcase: React.FC = () => {
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0)
 
-  // Interactive slider state for feature 4 preview
+  // Interactive slider state for feature 4 preview (in INR)
   const [diningCutPercent, setDiningCutPercent] = useState(20)
+  const baseDiningSpend = 6500 // ₹6,500/mo average dining
+  const monthlySavings = Math.round((baseDiningSpend * diningCutPercent) / 100)
+  const annualSavings = monthlySavings * 12
 
   const features = [
     {
       id: 'ledger',
-      badge: 'FEATURE 01 // CANONICAL RECORD',
+      badge: 'FEATURE 01 // MONEY LEDGER',
       title: 'Money Ledger',
-      subtitle: 'Forensic transaction record with integer-cent accuracy.',
+      subtitle: 'See your income and expenses in one clean place.',
       description:
-        'Every financial calculation rests on an unshakeable foundation. SpendSleuth stores amounts in minor units (integer cents) to eliminate IEEE-754 floating-point drift, while intelligent CSV column mapping ingests messy bank exports cleanly.',
+        'Add your transactions manually or import a standard CSV file from your bank. SpendSleuth organizes everything clearly so you always know where your money goes.',
       highlights: [
-        'Integer-cent storage eliminates fractional rounding errors',
-        'Intelligent CSV column mapper with live preview & mapping recall',
-        'SHA-256 fingerprint deduplication flags repeated imports',
-        'Structured category taxonomy optimized for students & young professionals',
+        'Accurate calculations with no rounding discrepancies',
+        'Simple CSV import with automatic column detection',
+        'Automatic duplicate detection prevents double-counting',
+        'Organized categories designed for students and young professionals',
       ],
       icon: FileSpreadsheet,
       accent: '#153326',
     },
     {
       id: 'detective',
-      badge: 'FEATURE 02 // CADENCE SURVEILLANCE',
+      badge: 'FEATURE 02 // RECURRING PAYMENT DETECTIVE',
       title: 'Recurring Payment Detective',
-      subtitle: 'Identify sneaky renewals and hidden monthly commitments.',
+      subtitle: 'Find payments that happen again and again, like subscriptions and monthly bills.',
       description:
-        'Subscription creep drains student and graduate budgets silently. The Detective analyzes interval regularity (weekly, bi-weekly, monthly, annual) and amount variance, calculating an explainable confidence score for every candidate.',
+        'Subscription creep can quietly eat into your monthly allowance. The Detective spots repeating weekly, monthly, and annual charges so you can review what you are actually using.',
       highlights: [
-        'Deterministic cadence clustering with tolerance windows',
-        'Amount variance tolerance detects creeping price hikes',
-        'User review lifecycle: Confirm, Ignore, or Adjust detected rules',
-        '30/60/90-day forward cashflow forecasting for active commitments',
+        'Recognizes regular weekly, monthly, and annual charges',
+        'Catches price increases on recurring memberships',
+        'Review and confirm which subscriptions you want to track',
+        'Estimates your next 30-day and 90-day upcoming bills',
       ],
       icon: Repeat,
       accent: '#52796F',
     },
     {
       id: 'radar',
-      badge: 'FEATURE 03 // STATISTICAL ANOMALY DETECTION',
+      badge: 'FEATURE 03 // SPENDING ANOMALY RADAR',
       title: 'Spending Anomaly Radar',
-      subtitle: 'Mathematically explainable alerts—never opaque guesswork.',
+      subtitle: 'Spot spending that is higher than usual and see what changed.',
       description:
-        'Instead of generic alert notifications, SpendSleuth models your rolling 60-day baseline per category. Outliers are flagged using z-score thresholds, 48-hour burst velocity, and unexpected merchant recognition with plain-language evidence.',
+        'Rather than confusing charts, SpendSleuth compares purchases against your typical category averages. When an unusually high charge occurs, it gives you a clear, plain-language reason.',
       highlights: [
-        'Z-score outlier detection (flags outlays > 2.5x normal standard deviation)',
-        '48-hour velocity spikes identify uncharacteristic shopping clusters',
-        'Clear mathematical explanations: "3.4x higher than your $45 grocery baseline"',
-        'Direct 1-click action: route any anomaly into an actionable savings plan',
+        'Highlights purchases that are significantly higher than normal',
+        'Spots short-term spending spikes over a few days',
+        'Plain-English reasons: "7x higher than your usual electronics average"',
+        'One-click action to turn an unexpected cost into a savings target',
       ],
       icon: AlertTriangle,
       accent: '#C97A2B',
     },
     {
       id: 'lab',
-      badge: 'FEATURE 04 // INTERACTIVE SIMULATION',
+      badge: 'FEATURE 04 // SAVINGS OPPORTUNITY LAB',
       title: 'Savings Opportunity Lab',
-      subtitle: 'Interactive what-if scenarios turned into committed goals.',
+      subtitle: 'Try a new monthly spending target and see how much you could set aside.',
       description:
-        'Closing the loop between investigation and action. Test what happens when you cut dining out by 15% or drop two unused streaming subscriptions. View 30-day, 6-month, and 1-year compounded yield forecasts.',
+        'Explore how small changes can add up over time. Adjust sliders for flexible spending like dining out or streaming services, and see estimated savings over 6 months and a full year.',
       highlights: [
-        'Interactive discretionary spending sliders with instant yield math',
-        'Subscription cancellation impact modeling',
-        'Save scenarios as concrete milestones with ledger progress tracking',
-        'Designed specifically for emergency fund & tuition cushion building',
+        'Interactive sliders with instant monthly and yearly estimates',
+        'See the financial impact of canceling unused subscriptions',
+        'Save plans as concrete goals and track them with new transactions',
+        'Built for emergency cushions, semester expenses, and savings goals',
       ],
       icon: PiggyBank,
       accent: '#2D6A4F',
@@ -93,21 +97,21 @@ export const FeatureShowcase: React.FC = () => {
           <div className="flex items-center gap-2 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#153326]" />
             <span className="font-mono text-xs text-[#52796F] uppercase tracking-wider">
-              Core Intelligence Modules
+              CORE FEATURES
             </span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-sans font-medium tracking-tight text-[#0C120F]">
-            Four specialized engines.{' '}
+            Four helpful tools.{' '}
             <span className="font-serif italic font-normal text-[#153326]">
-              One canonical dataset.
+              One clear view of your money.
             </span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-[#4B5952] leading-relaxed">
-            SpendSleuth unites transaction ingestion, pattern detection, statistical vigilance, and savings modeling into a cohesive investigative platform.
+            SpendSleuth brings transaction tracking, subscription detection, spending alerts, and savings planning together into one unified experience.
           </p>
         </div>
 
-        {/* Feature Navigation Tabs (Steep-inspired clean segmented buttons) */}
+        {/* Feature Navigation Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar border-b border-[#E6E6DF]">
           {features.map((feat, idx) => {
             const Icon = feat.icon
@@ -131,7 +135,7 @@ export const FeatureShowcase: React.FC = () => {
 
         {/* Active Feature Showcase Presentation */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left: Deep Dive Editorial Description */}
+          {/* Left: Description */}
           <div className="lg:col-span-6 space-y-6">
             <div>
               <span className="font-mono text-[11px] text-[#52796F] tracking-wide block mb-2">
@@ -165,7 +169,7 @@ export const FeatureShowcase: React.FC = () => {
                 href="#preview"
                 className="inline-flex items-center gap-2 text-xs font-semibold text-[#153326] hover:text-[#2D6A4F] transition-colors"
               >
-                <span>Inspect in live dashboard preview</span>
+                <span>See it in the demo preview</span>
                 <ChevronRight className="w-4 h-4" />
               </a>
             </div>
@@ -177,34 +181,34 @@ export const FeatureShowcase: React.FC = () => {
               /* Feature 1 Preview: Money Ledger Ingestion & Dedup */
               <div className="p-6 rounded-2xl bg-[#FBFBFA] border border-[#E6E6DF] shadow-xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-[#E6E6DF]">
-                  <span className="text-xs font-semibold text-[#16201B]">CSV Ingestion &amp; Column Mapping</span>
+                  <span className="text-xs font-semibold text-[#16201B]">CSV File Import</span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E3ECE8] text-[#153326]">
-                    PARSER READY
+                    READY TO IMPORT
                   </span>
                 </div>
 
                 <div className="space-y-2 font-mono text-[11px]">
                   <div className="p-2.5 rounded-lg bg-white border border-[#E6E6DF] flex items-center justify-between">
-                    <span className="text-[#62726A]">Header: [Posting Date]</span>
-                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ date (ISO 8601)</span>
+                    <span className="text-[#62726A]">Header: [Transaction Date]</span>
+                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ date</span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-white border border-[#E6E6DF] flex items-center justify-between">
-                    <span className="text-[#62726A]">Header: [Description]</span>
-                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ rawMerchant</span>
+                    <span className="text-[#62726A]">Header: [Merchant or Note]</span>
+                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ description</span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-white border border-[#E6E6DF] flex items-center justify-between">
-                    <span className="text-[#62726A]">Header: [Amount (USD)]</span>
-                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ amountInCents (int)</span>
+                    <span className="text-[#62726A]">Header: [Amount (₹ INR)]</span>
+                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ amount (₹)</span>
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-[#F2F7F4] border border-[#C2D3CC] text-xs text-[#153326]">
                   <div className="font-semibold flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-[#2D6A4F]" />
-                    <span>Fingerprint Deduplication Active</span>
+                    <span>Automatic Duplicate Detection</span>
                   </div>
                   <p className="text-[11px] text-[#4B5952] mt-1">
-                    SHA-256 hashes each row's date, normalized merchant, and integer cents. Zero risk of double-counting.
+                    SpendSleuth checks dates, amounts, and descriptions to ensure no transaction is imported twice.
                   </p>
                 </div>
               </div>
@@ -214,28 +218,28 @@ export const FeatureShowcase: React.FC = () => {
               /* Feature 2 Preview: Recurring Payment Detective */
               <div className="p-6 rounded-2xl bg-[#FBFBFA] border border-[#E6E6DF] shadow-xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-[#E6E6DF]">
-                  <span className="text-xs font-semibold text-[#16201B]">Candidate Subscription Audit</span>
+                  <span className="text-xs font-semibold text-[#16201B]">Found Subscription</span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E3ECE8] text-[#153326]">
-                    30-DAY REGULARITY
+                    MONTHLY BILL
                   </span>
                 </div>
 
                 <div className="p-4 rounded-xl bg-white border border-[#E6E6DF] space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-[#16201B]">Netflix Standard HD</div>
+                      <div className="text-sm font-semibold text-[#16201B]">Netflix Basic Plan</div>
                       <div className="text-xs text-[#62726A]">Digital Entertainment • Monthly billing</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-mono font-bold text-[#16201B]">$15.49/mo</div>
-                      <div className="text-[10px] text-[#52796F] font-mono">$185.88/yr</div>
+                      <div className="text-sm font-mono font-bold text-[#16201B]">{formatCurrency(199)}/mo</div>
+                      <div className="text-[10px] text-[#52796F] font-mono">{formatCurrency(2388)}/yr</div>
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex justify-between text-[11px] text-[#788780]">
-                      <span>Cadence Confidence</span>
-                      <span className="font-mono text-[#153326] font-semibold">98.4%</span>
+                      <span>Repeat Pattern Score</span>
+                      <span className="font-mono text-[#153326] font-semibold">98% regular</span>
                     </div>
                     <div className="w-full h-1.5 rounded-full bg-[#E6E6DF] overflow-hidden">
                       <div className="h-full bg-[#2D6A4F] rounded-full" style={{ width: '98%' }} />
@@ -243,13 +247,13 @@ export const FeatureShowcase: React.FC = () => {
                   </div>
 
                   <div className="text-[11px] font-mono text-[#62726A] pt-1">
-                    Evidence: Billed on Mar 14 ($15.49), Feb 14 ($15.49), Jan 14 ($15.49)
+                    Evidence: Billed on Mar 14 ({formatCurrency(199)}), Feb 14 ({formatCurrency(199)}), Jan 14 ({formatCurrency(199)})
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button className="flex-1 py-2 px-3 rounded-lg bg-[#153326] text-[#F2F7F4] text-xs font-medium hover:bg-[#1B4332] transition-colors cursor-pointer">
-                    Confirm Recurring Rule
+                    Confirm Subscription
                   </button>
                   <button className="py-2 px-3 rounded-lg bg-[#FFFFFF] border border-[#E6E6DF] text-[#62726A] text-xs hover:bg-[#F5F5F0] transition-colors cursor-pointer">
                     Ignore
@@ -264,38 +268,38 @@ export const FeatureShowcase: React.FC = () => {
                 <div className="flex items-center justify-between pb-3 border-b border-[#F3D7BD]">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#C97A2B] animate-pulse" />
-                    <span className="text-xs font-semibold text-[#7A400B]">Anomaly Investigation Card</span>
+                    <span className="text-xs font-semibold text-[#7A400B]">Unusual Spending Alert</span>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FCF4EB] text-[#C97A2B] font-bold border border-[#F3D7BD]">
-                    HIGH SEVERITY
+                    HIGHER THAN USUAL
                   </span>
                 </div>
 
                 <div className="p-4 rounded-xl bg-white border border-[#F3D7BD] space-y-2.5">
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-[#16201B]">Campus Tech Store</div>
-                      <div className="text-xs text-[#788780]">Electronics &amp; Hardware</div>
+                      <div className="text-sm font-semibold text-[#16201B]">Campus Electronics Store</div>
+                      <div className="text-xs text-[#788780]">Hardware &amp; Equipment</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-mono font-bold text-[#B83A2E]">$342.00</div>
-                      <div className="text-[10px] text-[#788780]">Baseline: $45.00</div>
+                      <div className="text-sm font-mono font-bold text-[#B83A2E]">{formatCurrency(8450)}</div>
+                      <div className="text-[10px] text-[#788780]">Usual average: {formatCurrency(1200)}</div>
                     </div>
                   </div>
 
                   <div className="p-2.5 rounded-lg bg-[#FCF4EB] text-[11px] text-[#7A400B] font-mono">
-                    RULE TRIGGERED: Z-Score 3.82 (&gt; 2.5 threshold). Single transaction represents 760% of average category outlay.
+                    NOTICE: This purchase is 7x higher than your usual electronics average of {formatCurrency(1200)}.
                   </div>
 
                   <div className="flex items-center justify-between pt-1 text-[11px] text-[#62726A]">
-                    <span>Detected on Apr 24, 2026</span>
-                    <span className="text-[#C97A2B] font-semibold">Flagged for user review</span>
+                    <span>Recorded on Apr 24, 2026</span>
+                    <span className="text-[#C97A2B] font-semibold">Flagged for review</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button className="flex-1 py-2 px-3 rounded-lg bg-[#153326] text-[#F2F7F4] text-xs font-medium hover:bg-[#1B4332] transition-colors cursor-pointer">
-                    Convert to Savings Target
+                    Turn into Savings Goal
                   </button>
                   <button className="py-2 px-3 rounded-lg bg-white border border-[#E6E6DF] text-[#62726A] text-xs hover:bg-[#F5F5F0] transition-colors cursor-pointer">
                     Dismiss (One-off)
@@ -308,7 +312,7 @@ export const FeatureShowcase: React.FC = () => {
               /* Feature 4 Preview: Savings Opportunity Lab */
               <div className="p-6 rounded-2xl bg-[#F2F7F4] border border-[#C2D3CC] shadow-xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-[#C2D3CC]">
-                  <span className="text-xs font-semibold text-[#153326]">Live Interactive Simulation</span>
+                  <span className="text-xs font-semibold text-[#153326]">Interactive Savings Calculator</span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white text-[#2D6A4F] border border-[#C2D3CC]">
                     WHAT-IF MODEL
                   </span>
@@ -317,7 +321,7 @@ export const FeatureShowcase: React.FC = () => {
                 {/* Interactive Slider */}
                 <div className="p-4 rounded-xl bg-white border border-[#C2D3CC] space-y-3">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-[#16201B]">Adjust Discretionary Dining</span>
+                    <span className="font-medium text-[#16201B]">Flexible Dining Out Adjustment</span>
                     <span className="font-mono font-bold text-[#153326] bg-[#E3ECE8] px-2 py-0.5 rounded">
                       -{diningCutPercent}%
                     </span>
@@ -334,30 +338,30 @@ export const FeatureShowcase: React.FC = () => {
                   />
 
                   <div className="flex justify-between text-[10px] font-mono text-[#788780]">
-                    <span>5% (Conservative)</span>
+                    <span>5% (Gentle)</span>
                     <span>20% (Recommended)</span>
-                    <span>40% (Aggressive)</span>
+                    <span>40% (Ambitious)</span>
                   </div>
 
-                  {/* Projected Capital Yield */}
+                  {/* Projected Savings in INR */}
                   <div className="pt-3 border-t border-[#E6E6DF] grid grid-cols-2 gap-3 text-center">
                     <div className="p-2.5 rounded-lg bg-[#FBFBFA] border border-[#E6E6DF]">
-                      <span className="text-[10px] font-mono text-[#788780] block">Monthly Yield</span>
+                      <span className="text-[10px] font-mono text-[#788780] block">Monthly Savings</span>
                       <span className="text-base font-serif font-bold text-[#153326]">
-                        +${Math.round((diningCutPercent * 450) / 100)}
+                        +{formatCurrency(monthlySavings)}
                       </span>
                     </div>
                     <div className="p-2.5 rounded-lg bg-[#FBFBFA] border border-[#E6E6DF]">
-                      <span className="text-[10px] font-mono text-[#788780] block">Annual Reserve</span>
+                      <span className="text-[10px] font-mono text-[#788780] block">Annual Savings</span>
                       <span className="text-base font-serif font-bold text-[#2D6A4F]">
-                        +${Math.round((diningCutPercent * 450 * 12) / 100)}
+                        +{formatCurrency(annualSavings)}
                       </span>
                     </div>
                   </div>
                 </div>
 
                 <button className="w-full py-2.5 px-3 rounded-lg bg-[#153326] text-[#F2F7F4] text-xs font-medium hover:bg-[#1B4332] transition-colors flex items-center justify-center gap-2 cursor-pointer">
-                  <span>Commit Scenario to Savings Goals</span>
+                  <span>Save this monthly goal</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>

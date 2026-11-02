@@ -10,6 +10,7 @@ import {
   ArrowDownRight,
 } from 'lucide-react'
 import { BrandLogo } from '../common/BrandLogo'
+import { formatCurrency } from '../../lib/formatCurrency'
 
 interface DashboardPreviewProps {
   onInteract?: (featureName: string) => void
@@ -19,68 +20,68 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
   const [activeTab, setActiveTab] = useState<'30D' | '60D' | '90D'>('30D')
   const [selectedRow, setSelectedRow] = useState<string | null>('t2')
 
-  // Sample illustrative transactions
+  // Sample illustrative INR transactions (matching demo profile)
   const sampleTransactions = [
     {
       id: 't1',
-      merchant: 'University Campus Bookstore',
+      merchant: 'Advanced Robotics Lab & Kit',
       category: 'Education & Textbooks',
       date: 'Apr 24, 2026',
-      amountInCents: 31240, // $312.40
+      amount: 9800,
       type: 'expense' as const,
       status: 'anomaly' as const,
-      evidence: '4.2x above category moving baseline',
+      evidence: '4.1x above your usual education average',
     },
     {
       id: 't2',
-      merchant: 'Spotify Family Subscription',
+      merchant: 'Spotify Premium Family',
       category: 'Digital Services',
       date: 'Apr 21, 2026',
-      amountInCents: 1699, // $16.99
+      amount: 199,
       type: 'expense' as const,
       status: 'recurring' as const,
-      evidence: 'Cadence: 30-day regular cycle (99% confidence)',
+      evidence: 'Repeats every month (verified bill)',
     },
     {
       id: 't3',
-      merchant: 'Trader Joe’s Market',
+      merchant: 'Nature Basket Supermarket',
       category: 'Groceries & Staples',
       date: 'Apr 19, 2026',
-      amountInCents: 7845, // $78.45
+      amount: 2840,
       type: 'expense' as const,
       status: 'normal' as const,
-      evidence: 'Within expected weekly baseline',
+      evidence: 'Within typical weekly grocery budget',
     },
     {
       id: 't4',
       merchant: 'Tech Internship Monthly Stipend',
-      category: 'Primary Income',
+      category: 'Salary & Stipend',
       date: 'Apr 15, 2026',
-      amountInCents: 320000, // $3,200.00
+      amount: 45000,
       type: 'income' as const,
       status: 'verified' as const,
-      evidence: 'Bi-monthly recurring credit',
+      evidence: 'Monthly recurring credit',
     },
     {
       id: 't5',
-      merchant: 'Blue Bottle Coffee Roasters',
+      merchant: 'Third Wave Coffee Roasters',
       category: 'Food & Dining',
       date: 'Apr 12, 2026',
-      amountInCents: 1850, // $18.50
+      amount: 380,
       type: 'expense' as const,
       status: 'normal' as const,
-      evidence: 'Discretionary frequency normal',
+      evidence: 'Typical coffee run',
     },
   ]
 
-  // Monthly spending distribution bars (SVG graph coordinates)
+  // Monthly spending distribution in INR
   const monthlyData = [
-    { month: 'Nov', spend: 1840, baseline: 1900 },
-    { month: 'Dec', spend: 2310, baseline: 1950 },
-    { month: 'Jan', spend: 1720, baseline: 1900 },
-    { month: 'Feb', spend: 1680, baseline: 1850 },
-    { month: 'Mar', spend: 2040, baseline: 1900 },
-    { month: 'Apr', spend: 1945, baseline: 1900 },
+    { month: 'Nov', spend: 46200, baseline: 47500 },
+    { month: 'Dec', spend: 58400, baseline: 48000 },
+    { month: 'Jan', spend: 43100, baseline: 47500 },
+    { month: 'Feb', spend: 42000, baseline: 46000 },
+    { month: 'Mar', spend: 51200, baseline: 47500 },
+    { month: 'Apr', spend: 48650, baseline: 47500 },
   ]
 
   return (
@@ -89,14 +90,14 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
       <div className="flex flex-col sm:flex-row items-center justify-between pb-4 border-b border-[#E6E6DF] mb-6 text-xs text-[#62726A]">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[#153326] font-semibold tracking-wider">
-            [SPENDSLEUTH LAB PREVIEW // CASE #4029]
+            [SPENDSLEUTH DEMO PREVIEW]
           </span>
           <span className="hidden sm:inline text-[#D4D4CA]">|</span>
-          <span className="hidden sm:inline">Subject: Alex M. (Early Career Engineer)</span>
+          <span className="hidden sm:inline">Profile: Alex M. (Student &amp; SWE Intern)</span>
         </div>
         <div className="mt-2 sm:mt-0 flex items-center gap-2">
           <span className="inline-block w-2 h-2 rounded-full bg-[#2D6A4F]" />
-          <span className="font-mono text-[11px] text-[#2D6A4F]">ILLUSTRATIVE FINANCIAL DATASET</span>
+          <span className="font-mono text-[11px] text-[#2D6A4F]">ILLUSTRATIVE DEMO DATA (INR ₹)</span>
         </div>
       </div>
 
@@ -115,13 +116,13 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
             <div className="w-2.5 h-2.5 rounded-full bg-[#E6E6DF] border border-[#D4D4CA]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#E6E6DF] border border-[#D4D4CA]" />
             <span className="ml-3 text-xs font-mono text-[#788780] hidden sm:inline">
-              spendsleuth.app/forensics/ledger
+              spendsleuth.app/overview
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#E3ECE8] text-[#153326] border border-[#C2D3CC]">
-              4 INVESTIGATIVE ENGINES ACTIVE
+              SAMPLE FINANCIAL OVERVIEW
             </span>
           </div>
         </div>
@@ -135,34 +136,34 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
                 <BrandLogo size="sm" showTagline />
               </div>
 
-              {/* Forensic Navigation Items */}
+              {/* Navigation Items */}
               <div className="space-y-1">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-[#788780] px-3 py-1">
-                  Investigation
+                  Features
                 </div>
 
                 <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium bg-[#153326] text-[#F2F7F4] shadow-2xs">
                   <span className="flex items-center gap-2.5">
                     <TrendingUp className="w-3.5 h-3.5 text-[#9DB4AC]" />
-                    <span>Intelligence Hub</span>
+                    <span>Overview</span>
                   </span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#74968C]" />
                 </button>
 
                 <button
                   onClick={() => onInteract?.('Money Ledger')}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#4B5952] hover:bg-[#F5F5F0] transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#4B5952] hover:bg-[#F5F5F0] transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
                     <Calendar className="w-3.5 h-3.5 text-[#788780]" />
                     <span>Money Ledger</span>
                   </span>
-                  <span className="text-[10px] font-mono text-[#788780]">142 tx</span>
+                  <span className="text-[10px] font-mono text-[#788780]">142 items</span>
                 </button>
 
                 <button
                   onClick={() => onInteract?.('Recurring Detective')}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#4B5952] hover:bg-[#F5F5F0] transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#4B5952] hover:bg-[#F5F5F0] transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
                     <Repeat className="w-3.5 h-3.5 text-[#52796F]" />
@@ -175,26 +176,26 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
 
                 <button
                   onClick={() => onInteract?.('Anomaly Radar')}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#4B5952] hover:bg-[#F5F5F0] transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#4B5952] hover:bg-[#F5F5F0] transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
                     <AlertTriangle className="w-3.5 h-3.5 text-[#C97A2B]" />
                     <span>Anomaly Radar</span>
                   </span>
                   <span className="px-1.5 py-0.2 rounded bg-[#FCF4EB] text-[#C97A2B] text-[10px] font-mono font-semibold">
-                    1 flagged
+                    1 higher
                   </span>
                 </button>
 
                 <button
                   onClick={() => onInteract?.('Savings Lab')}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#4B5952] hover:bg-[#F5F5F0] transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[#4B5952] hover:bg-[#F5F5F0] transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
                     <PiggyBank className="w-3.5 h-3.5 text-[#2D6A4F]" />
                     <span>Savings Lab</span>
                   </span>
-                  <span className="text-[10px] font-mono text-[#2D6A4F] font-semibold">+$245/mo</span>
+                  <span className="text-[10px] font-mono text-[#2D6A4F] font-semibold">+₹5,800/mo</span>
                 </button>
               </div>
             </div>
@@ -219,42 +220,42 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               <div className="p-4 rounded-xl bg-[#FBFBFA] border border-[#E6E6DF]">
                 <div className="text-[11px] font-mono text-[#788780] uppercase tracking-wide">
-                  Monitored Outflow
+                  Monthly Expenses
                 </div>
                 <div className="text-xl sm:text-2xl font-serif font-medium text-[#16201B] mt-1">
-                  $1,945<span className="text-xs font-mono font-normal text-[#788780]">.84</span>
+                  {formatCurrency(48650)}
                 </div>
                 <div className="flex items-center gap-1 text-[11px] text-[#2D6A4F] mt-1 font-medium">
                   <ArrowDownRight className="w-3.5 h-3.5" />
-                  <span>3.2% vs 60d avg</span>
+                  <span>Typical monthly pace</span>
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-[#FBFBFA] border border-[#E6E6DF]">
                 <div className="text-[11px] font-mono text-[#788780] uppercase tracking-wide">
-                  Recurring Commitments
+                  Subscriptions
                 </div>
                 <div className="text-xl sm:text-2xl font-serif font-medium text-[#16201B] mt-1">
-                  $142<span className="text-xs font-mono font-normal text-[#788780]">.50</span>
+                  {formatCurrency(2450)}
                   <span className="text-[10px] font-mono text-[#788780] font-normal ml-1">/mo</span>
                 </div>
                 <div className="flex items-center gap-1 text-[11px] text-[#52796F] mt-1 font-medium">
                   <Repeat className="w-3.5 h-3.5" />
-                  <span>6 verified services</span>
+                  <span>6 active services</span>
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-[#FCF4EB] border border-[#F3D7BD]">
                 <div className="text-[11px] font-mono text-[#C97A2B] uppercase tracking-wide flex items-center justify-between">
-                  <span>Detected Spikes</span>
+                  <span>Higher Spending</span>
                   <span className="w-2 h-2 rounded-full bg-[#C97A2B]" />
                 </div>
                 <div className="text-xl sm:text-2xl font-serif font-medium text-[#7A400B] mt-1">
-                  1 <span className="text-xs font-sans font-normal text-[#7A400B]">anomaly</span>
+                  1 <span className="text-xs font-sans font-normal text-[#7A400B]">payment</span>
                 </div>
                 <div className="flex items-center gap-1 text-[11px] text-[#C97A2B] mt-1 font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>+$234 beyond baseline</span>
+                  <span>{formatCurrency(7400)} above average</span>
                 </div>
               </div>
 
@@ -263,22 +264,23 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
                   Potential Savings
                 </div>
                 <div className="text-xl sm:text-2xl font-serif font-medium text-[#153326] mt-1">
-                  +$245<span className="text-xs font-mono font-normal text-[#2D6A4F]">/mo</span>
+                  +{formatCurrency(5800)}
+                  <span className="text-xs font-mono font-normal text-[#2D6A4F]">/mo</span>
                 </div>
                 <div className="flex items-center gap-1 text-[11px] text-[#2D6A4F] mt-1 font-medium">
                   <PiggyBank className="w-3.5 h-3.5" />
-                  <span>2 simulation models</span>
+                  <span>2 simple adjustments</span>
                 </div>
               </div>
             </div>
 
-            {/* Visual Analytics Chart (Finora Inspiration: Spending Velocity Trend) */}
+            {/* Visual Analytics Chart (Finora Inspiration: Spending Trend) */}
             <div className="p-5 rounded-xl border border-[#E6E6DF] bg-[#FDFDFD]">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#E6E6DF] gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-[#16201B]">Spending Velocity vs Baseline</h3>
+                  <h3 className="text-sm font-semibold text-[#16201B]">Monthly Spending Trends</h3>
                   <p className="text-xs text-[#62726A]">
-                    Calculated using 60-day moving average baselines across all categories
+                    Compare each month&apos;s spending against your typical monthly average
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 bg-[#F5F5F0] p-1 rounded-lg self-start sm:self-auto">
@@ -286,7 +288,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-2.5 py-1 text-xs font-mono rounded-md transition-colors ${
+                      className={`px-2.5 py-1 text-xs font-mono rounded-md transition-colors cursor-pointer ${
                         activeTab === tab
                           ? 'bg-white text-[#153326] font-semibold shadow-2xs'
                           : 'text-[#62726A] hover:text-[#16201B]'
@@ -302,7 +304,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
               <div className="pt-5 pb-2">
                 <div className="relative h-36 w-full flex items-end justify-between gap-3 sm:gap-6 px-2 sm:px-6">
                   {monthlyData.map((d) => {
-                    const heightPercent = Math.round((d.spend / 2600) * 100)
+                    const heightPercent = Math.round((d.spend / 65000) * 100)
                     const isApril = d.month === 'Apr'
 
                     return (
@@ -310,8 +312,8 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
                         {/* Tooltip on April / active month */}
                         {isApril && (
                           <div className="absolute -top-3 left-3/4 sm:left-[80%] -translate-x-1/2 bg-[#153326] text-[#F2F7F4] text-[10px] font-mono px-3 py-1.5 rounded-lg shadow-md whitespace-nowrap z-20">
-                            <span className="block text-[#9DB4AC]">Apr 2026 Outflow</span>
-                            <span className="font-bold">$1,945.84</span> (Baseline $1,900)
+                            <span className="block text-[#9DB4AC]">Apr 2026 Spending</span>
+                            <span className="font-bold">{formatCurrency(48650)}</span> (Usual {formatCurrency(47500)})
                           </div>
                         )}
 
@@ -320,7 +322,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
                           {/* Baseline threshold marker */}
                           <div
                             className="absolute w-full border-t border-dashed border-[#788780]/40 z-10"
-                            style={{ bottom: `${(d.baseline / 2600) * 100}%` }}
+                            style={{ bottom: `${(d.baseline / 65000) * 100}%` }}
                           />
                           {/* Main Bar */}
                           <div
@@ -346,17 +348,17 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
               </div>
             </div>
 
-            {/* Forensic Ledger Table (Canonical Transaction List) */}
+            {/* Transaction List (Canonical Ledger preview) */}
             <div className="rounded-xl border border-[#E6E6DF] overflow-hidden">
               <div className="px-5 py-3.5 bg-[#FBFBFA] border-b border-[#E6E6DF] flex items-center justify-between">
                 <div>
-                  <h3 className="text-xs font-semibold text-[#16201B]">Recent Forensic Ledger Entries</h3>
+                  <h3 className="text-xs font-semibold text-[#16201B]">Recent Transactions</h3>
                   <span className="text-[11px] text-[#788780]">
-                    Canonical minor-unit transaction record with investigative tags
+                    See individual purchases and why they stand out
                   </span>
                 </div>
                 <span className="text-[11px] font-mono text-[#52796F] bg-[#E3ECE8] px-2 py-0.5 rounded">
-                  CSV IMPORT VERIFIED
+                  CSV IMPORT SAMPLE
                 </span>
               </div>
 
@@ -399,12 +401,12 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
                             <span>{tx.merchant}</span>
                             {tx.status === 'anomaly' && (
                               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#FCF4EB] text-[#C97A2B] font-semibold border border-[#F3D7BD]">
-                                SPENDING SPIKE
+                                HIGHER THAN USUAL
                               </span>
                             )}
                             {tx.status === 'recurring' && (
                               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#E3ECE8] text-[#153326] border border-[#C2D3CC]">
-                                RECURRING CADENCE
+                                MONTHLY REPEAT
                               </span>
                             )}
                           </div>
@@ -421,7 +423,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
                             tx.type === 'income' ? 'text-[#2D6A4F]' : 'text-[#16201B]'
                           }`}
                         >
-                          {tx.type === 'income' ? '+' : '-'}${ (tx.amountInCents / 100).toFixed(2) }
+                          {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
                         </span>
                       </div>
                     </div>
@@ -432,18 +434,18 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
           </div>
         </div>
 
-        {/* Floating Investigative Annotation Pill (Echoing the Steep reference cursor card) */}
+        {/* Floating Annotation Pill (Echoing the Steep reference cursor card) */}
         <div className="hidden lg:flex absolute bottom-8 right-8 z-30 max-w-sm p-4 rounded-xl bg-[#FFFFFF] border border-[#153326]/20 shadow-xl items-start gap-3">
           <div className="w-7 h-7 rounded-full bg-[#153326] text-[#E3ECE8] flex items-center justify-center font-mono text-xs shrink-0 mt-0.5 font-bold">
             SL
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-[#16201B]">Investigative Agent</span>
+              <span className="text-xs font-semibold text-[#16201B]">SpendSleuth Guide</span>
               <span className="text-[10px] font-mono text-[#788780]">Apr 28</span>
             </div>
             <p className="text-xs text-[#4B5952] mt-0.5 leading-relaxed">
-              Detected recurring charge <span className="font-medium text-[#16201B]">Spotify Family ($16.99)</span> with 99% cadence confidence. Flagged 1 semester textbook outlier for review.
+              Found 1 recurring subscription for <span className="font-medium text-[#16201B]">Spotify Premium (₹199/mo)</span> and flagged 1 college project kit that was higher than usual.
             </p>
           </div>
         </div>

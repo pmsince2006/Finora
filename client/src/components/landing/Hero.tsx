@@ -30,23 +30,20 @@ export const Hero: React.FC<HeroProps> = ({ onStartInvestigating, onExploreProdu
 
   return (
     <section className="relative pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden">
-      {/* Editorial Grid Crosshairs & Fine Investigative Coordinates */}
-      <div className="absolute top-28 left-8 sm:left-16 text-[#A2B0A9]/60 select-none pointer-events-none font-mono text-[11px] hidden sm:block">
-        <span className="block">+ CASE FILE #2026.04</span>
-        <span className="text-[#62726A]/50">LAT 37.77 • LON -122.41</span>
-      </div>
-
-      <div className="absolute top-28 right-8 sm:right-16 text-[#A2B0A9]/60 select-none pointer-events-none font-mono text-[11px] text-right hidden sm:block">
-        <span className="block">INTELLIGENCE RADAR</span>
-        <span className="text-[#62726A]/50">STATUS // ACTIVE SCAN</span>
-      </div>
-
-      {/* Decorative Subtle Crosshair Markers (Echoing the Steep reference) */}
-      <div className="absolute top-36 left-1/4 -translate-x-12 text-[#9DB4AC]/40 select-none pointer-events-none text-xl font-light">
-        +
-      </div>
-      <div className="absolute top-44 right-1/4 translate-x-12 text-[#9DB4AC]/40 select-none pointer-events-none text-2xl font-light">
-        *
+      {/* Refined and responsive background grid lines (contained & subtle) */}
+      <div className="absolute inset-0 max-w-7xl mx-auto pointer-events-none select-none opacity-40 -z-10" aria-hidden="true">
+        <div className="absolute left-6 top-32 text-xs font-mono text-[#A2B0A9]">
+          +
+        </div>
+        <div className="absolute right-6 top-32 text-xs font-mono text-[#A2B0A9]">
+          +
+        </div>
+        <div className="hidden sm:block absolute left-1/4 top-40 text-[10px] font-mono text-[#CBD5D0]">
+          +
+        </div>
+        <div className="hidden sm:block absolute right-1/4 top-40 text-[10px] font-mono text-[#CBD5D0]">
+          +
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -56,11 +53,11 @@ export const Hero: React.FC<HeroProps> = ({ onStartInvestigating, onExploreProdu
           animate="visible"
           className="flex flex-col items-center"
         >
-          {/* Subtle Investigative Pill Badge */}
+          {/* Meaningful, Clean Eyebrow Badge (Issue 1 & 3: Friendly & Relevant) */}
           <motion.div variants={itemVariants} className="mb-6">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E3ECE8]/70 border border-[#C2D3CC] text-[11px] font-mono tracking-tight text-[#153326] shadow-2xs">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E3ECE8]/80 border border-[#C2D3CC] text-[11px] font-mono tracking-wide text-[#153326] shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F] animate-pulse" />
-              <span>FORENSIC PERSONAL FINANCE INTELLIGENCE</span>
+              <span>PERSONAL FINANCE INTELLIGENCE</span>
             </span>
           </motion.div>
 
@@ -75,12 +72,12 @@ export const Hero: React.FC<HeroProps> = ({ onStartInvestigating, onExploreProdu
             </span>
           </motion.h1>
 
-          {/* Supporting Copy */}
+          {/* Supporting Copy (Issue 3: Simple, natural English) */}
           <motion.p
             variants={itemVariants}
             className="mt-6 text-base sm:text-lg text-[#4B5952] max-w-2xl font-normal leading-relaxed text-balance"
           >
-            SpendSleuth scrutinizes your raw transactions to expose sneaky recurring subscriptions, mathematically identify spending anomalies, and engineer realistic, evidence-backed savings plans.
+            SpendSleuth helps you understand your money by finding recurring subscriptions, spotting unusually high spending, and exploring realistic ways to save.
           </motion.p>
 
           {/* Primary & Secondary Call to Actions */}
@@ -90,7 +87,7 @@ export const Hero: React.FC<HeroProps> = ({ onStartInvestigating, onExploreProdu
           >
             <button
               onClick={onStartInvestigating}
-              className="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#153326] text-[#F2F7F4] text-sm font-medium hover:bg-[#1B4332] active:scale-98 transition-all shadow-sm hover:shadow"
+              className="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#153326] text-[#F2F7F4] text-sm font-medium hover:bg-[#1B4332] active:scale-98 transition-all shadow-sm hover:shadow cursor-pointer"
             >
               <FileSearch className="w-4 h-4 text-[#9DB4AC]" />
               <span>Start investigating</span>
@@ -99,26 +96,28 @@ export const Hero: React.FC<HeroProps> = ({ onStartInvestigating, onExploreProdu
 
             <button
               onClick={onExploreProduct}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#16201B] text-sm font-medium hover:bg-[#F5F5F0] hover:border-[#D4D4CA] transition-all shadow-2xs"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#16201B] text-sm font-medium hover:bg-[#F5F5F0] hover:border-[#D4D4CA] transition-all shadow-2xs cursor-pointer"
             >
               <span>Explore the product</span>
             </button>
           </motion.div>
 
-          {/* Editorial Trust / Privacy Stamp */}
+          {/* Editorial Trust & Privacy Notice */}
           <motion.div
             variants={itemVariants}
-            className="mt-8 flex items-center gap-6 text-xs text-[#62726A]"
+            className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-[#62726A]"
           >
             <div className="flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5 text-[#52796F]" />
-              <span>No bank passwords required</span>
+              <span>No bank passwords needed</span>
             </div>
-            <span className="text-[#D4D4CA]">•</span>
+            <span className="text-[#D4D4CA] hidden sm:inline">•</span>
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#52796F]" />
-              <span>Deterministic rule engines</span>
+              <span>Clear, explainable calculations</span>
             </div>
+            <span className="text-[#D4D4CA] hidden sm:inline">•</span>
+            <span>Manual entries &amp; CSV files</span>
           </motion.div>
         </motion.div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Navbar } from '../components/common/Navbar'
 import { Hero } from '../components/landing/Hero'
@@ -8,20 +8,12 @@ import { FeatureShowcase } from '../components/landing/FeatureShowcase'
 import { InteractiveScenarioTester } from '../components/landing/InteractiveScenarioTester'
 import { ClosingCTA } from '../components/landing/ClosingCTA'
 import { Footer } from '../components/common/Footer'
-import { AuthPlaceholderModal } from '../components/common/AuthPlaceholderModal'
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
-  const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('register')
 
   const handleOpenAuth = (mode: 'login' | 'register') => {
-    setAuthModalMode(mode)
-    setAuthModalOpen(true)
-  }
-
-  const handleCloseAuth = () => {
-    setAuthModalOpen(false)
+    navigate(mode === 'login' ? '/login' : '/register')
   }
 
   const handleJumpToPreview = () => {
@@ -48,7 +40,7 @@ export const LandingPage: React.FC = () => {
       <main className="flex-1">
         {/* Hero Section with Editorial Headline */}
         <Hero
-          onStartInvestigating={() => handleOpenAuth('register')}
+          onStartInvestigating={() => navigate('/register')}
           onExploreProduct={handleNavigateToApp}
         />
 
@@ -66,7 +58,7 @@ export const LandingPage: React.FC = () => {
           }}
         />
 
-        {/* 3-Step Forensic Workflow */}
+        {/* 3-Step Simple Workflow */}
         <HowItWorks />
 
         {/* Four Dedicated Feature Showcases */}
@@ -79,21 +71,13 @@ export const LandingPage: React.FC = () => {
 
         {/* Closing Action Banner */}
         <ClosingCTA
-          onStartInvestigating={() => handleOpenAuth('register')}
+          onStartInvestigating={() => navigate('/register')}
           onExploreDemo={handleNavigateToApp}
         />
       </main>
 
       {/* Editorial Footer */}
       <Footer />
-
-      {/* Auth & Preview Gateway Modal */}
-      <AuthPlaceholderModal
-        isOpen={authModalOpen}
-        onClose={handleCloseAuth}
-        initialMode={authModalMode}
-        onExploreDemo={handleNavigateToApp}
-      />
     </div>
   )
 }

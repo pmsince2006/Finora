@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
+import { formatCurrency } from '../../lib/formatCurrency'
 
 interface InteractiveScenarioTesterProps {
   onCommitPlan: () => void
@@ -9,14 +10,14 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
   onCommitPlan,
 }) => {
   const [diningReduction, setDiningReduction] = useState<number>(20) // percent
-  const [cancelStreaming, setCancelStreaming] = useState<boolean>(true) // $16.99/mo
-  const [prepCampusMeals, setPrepCampusMeals] = useState<boolean>(false) // $75.00/mo
+  const [cancelStreaming, setCancelStreaming] = useState<boolean>(true) // ₹299/mo
+  const [prepCampusMeals, setPrepCampusMeals] = useState<boolean>(false) // ₹1,800/mo
 
-  // Calculations
-  const diningBaseSpend = 380 // $380/mo average student dining
+  // INR Calculations
+  const diningBaseSpend = 6500 // ₹6,500/mo average dining
   const diningSavings = (diningBaseSpend * diningReduction) / 100
-  const streamingSavings = cancelStreaming ? 16.99 : 0
-  const mealSavings = prepCampusMeals ? 75.0 : 0
+  const streamingSavings = cancelStreaming ? 299 : 0
+  const mealSavings = prepCampusMeals ? 1800 : 0
 
   const monthlyTotal = Math.round(diningSavings + streamingSavings + mealSavings)
   const sixMonthTotal = monthlyTotal * 6
@@ -27,10 +28,10 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <span className="font-mono text-xs text-[#52796F] uppercase tracking-wider block mb-2">
-            Interactive Scenario Sandbox
+            SAVINGS CALCULATOR
           </span>
           <h2 className="text-3xl sm:text-4xl font-sans font-medium tracking-tight text-[#0C120F]">
-            Simulate your savings potential in{' '}
+            Try a monthly savings goal in{' '}
             <span className="font-serif italic font-normal text-[#153326]">
               real time.
             </span>
@@ -46,9 +47,9 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
           <div className="md:col-span-7 space-y-6">
             <div>
               <div className="flex items-center justify-between text-xs font-semibold text-[#16201B] mb-2">
-                <span>Discretionary Dining Reduction</span>
+                <span>Flexible Dining Out Adjustment</span>
                 <span className="font-mono text-[#153326] bg-[#E3ECE8] px-2 py-0.5 rounded text-xs">
-                  {diningReduction}% (${Math.round(diningSavings)}/mo saved)
+                  {diningReduction}% ({formatCurrency(Math.round(diningSavings))}/mo saved)
                 </span>
               </div>
               <input
@@ -67,7 +68,7 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
               </div>
             </div>
 
-            {/* Toggle Toggles */}
+            {/* Toggles */}
             <div className="space-y-3 pt-2">
               <label className="flex items-center justify-between p-3.5 rounded-xl border border-[#E6E6DF] bg-[#FBFBFA] hover:bg-[#F5F5F0] transition-colors cursor-pointer select-none">
                 <div className="flex items-center gap-3">
@@ -79,14 +80,14 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
                   />
                   <div>
                     <span className="text-xs font-medium text-[#16201B] block">
-                      Cancel 1 Dormant Streaming Sub
+                      Cancel 1 unused streaming subscription
                     </span>
                     <span className="text-[11px] text-[#788780]">
-                      Identified by Recurring Detective (Spotify / Video)
+                      E.g. video or audio streaming service
                     </span>
                   </div>
                 </div>
-                <span className="font-mono text-xs font-semibold text-[#2D6A4F]">+$17/mo</span>
+                <span className="font-mono text-xs font-semibold text-[#2D6A4F]">+{formatCurrency(299)}/mo</span>
               </label>
 
               <label className="flex items-center justify-between p-3.5 rounded-xl border border-[#E6E6DF] bg-[#FBFBFA] hover:bg-[#F5F5F0] transition-colors cursor-pointer select-none">
@@ -99,14 +100,14 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
                   />
                   <div>
                     <span className="text-xs font-medium text-[#16201B] block">
-                      Prep Campus Lunches 2x / Week
+                      Pack lunch twice a week
                     </span>
                     <span className="text-[11px] text-[#788780]">
-                      Replaces campus café food court outlays
+                      Replaces campus café purchases
                     </span>
                   </div>
                 </div>
-                <span className="font-mono text-xs font-semibold text-[#2D6A4F]">+$75/mo</span>
+                <span className="font-mono text-xs font-semibold text-[#2D6A4F]">+{formatCurrency(1800)}/mo</span>
               </label>
             </div>
           </div>
@@ -115,10 +116,10 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
           <div className="md:col-span-5 bg-[#FBFBFA] rounded-xl border border-[#E6E6DF] p-6 text-center space-y-5">
             <div>
               <span className="font-mono text-[10px] uppercase tracking-wider text-[#788780] block">
-                Projected Monthly Capital
+                Estimated Monthly Savings
               </span>
               <div className="text-4xl font-serif font-bold text-[#153326] mt-1">
-                +${monthlyTotal}
+                +{formatCurrency(monthlyTotal)}
                 <span className="text-xs font-mono font-normal text-[#788780]">/mo</span>
               </div>
             </div>
@@ -127,13 +128,13 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
               <div className="p-2.5 rounded-lg bg-white border border-[#E6E6DF]">
                 <span className="text-[10px] font-mono text-[#788780] block">6-Month Buffer</span>
                 <span className="text-base font-serif font-bold text-[#16201B]">
-                  +${sixMonthTotal}
+                  +{formatCurrency(sixMonthTotal)}
                 </span>
               </div>
               <div className="p-2.5 rounded-lg bg-white border border-[#E6E6DF]">
                 <span className="text-[10px] font-mono text-[#788780] block">1-Year Reserve</span>
                 <span className="text-base font-serif font-bold text-[#2D6A4F]">
-                  +${annualTotal}
+                  +{formatCurrency(annualTotal)}
                 </span>
               </div>
             </div>
@@ -141,15 +142,17 @@ export const InteractiveScenarioTester: React.FC<InteractiveScenarioTesterProps>
             <div className="p-2.5 rounded-lg bg-[#E3ECE8]/60 text-[11px] text-[#153326] text-left">
               <span className="font-semibold block">Realistic Milestone:</span>
               <span className="text-[#35423B]">
-                Covers {annualTotal > 1200 ? '1 semester tuition delta & laptop upgrade' : 'emergency security deposit buffer'}.
+                {annualTotal > 30000
+                  ? 'Covers semester books, exam fees, and emergency travel reserves.'
+                  : 'Builds a solid security deposit and emergency fund.'}
               </span>
             </div>
 
             <button
               onClick={onCommitPlan}
-              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#153326] text-[#F2F7F4] text-xs font-medium hover:bg-[#1B4332] active:scale-98 transition-all shadow-xs"
+              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#153326] text-[#F2F7F4] text-xs font-medium hover:bg-[#1B4332] active:scale-98 transition-all shadow-xs cursor-pointer"
             >
-              <span>Commit Plan in SpendSleuth</span>
+              <span>Try this plan in the demo</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

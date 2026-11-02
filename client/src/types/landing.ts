@@ -8,16 +8,19 @@ export interface PreviewTransaction {
   merchant: string
   category: string
   date: string
-  amountInCents: number
+  amount: number // in INR (₹)
+  amountInCents?: number // backward compatibility
   type: 'income' | 'expense'
-  status: 'verified' | 'flagged' | 'recurring' | 'regular'
+  status: 'verified' | 'flagged' | 'recurring' | 'normal' | 'regular' | 'anomaly'
+  evidence?: string
 }
 
 export interface RecurringFinding {
   id: string
   merchant: string
   cadence: 'Monthly' | 'Annual' | 'Weekly'
-  amountInCents: number
+  amount: number // in INR (₹)
+  amountInCents?: number
   confidence: number
   intervalDays: number
   lastBilled: string
@@ -27,8 +30,10 @@ export interface RecurringFinding {
 export interface AnomalyFinding {
   id: string
   merchant: string
-  amountInCents: number
-  baselineInCents: number
+  amount: number // in INR (₹)
+  amountInCents?: number
+  baselineAmount: number // in INR (₹)
+  baselineInCents?: number
   ratio: number
   category: string
   reason: string
@@ -42,7 +47,10 @@ export interface SavingsScenario {
   description: string
   category: string
   defaultCutPercent: number
-  monthlySavingsInCents: number
-  sixMonthTotalInCents: number
-  annualTotalInCents: number
+  monthlySavings: number // in INR (₹)
+  sixMonthTotal: number // in INR (₹)
+  annualTotal: number // in INR (₹)
+  monthlySavingsInCents?: number
+  sixMonthTotalInCents?: number
+  annualTotalInCents?: number
 }
