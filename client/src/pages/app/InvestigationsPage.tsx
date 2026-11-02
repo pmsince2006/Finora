@@ -99,12 +99,6 @@ export const InvestigationsPage: React.FC = () => {
     return list
   }, [filteredFindings, sortOption])
 
-  // Maximum spike ratio among active findings
-  const highestRatio = useMemo(() => {
-    if (anomalyAnalysis.activeFindings.length === 0) return 0
-    return Math.max(...anomalyAnalysis.activeFindings.map((f) => f.ratio))
-  }, [anomalyAnalysis])
-
   // Handlers
   const handleReview = (finding: AnomalyFinding) => {
     reviewAnomalyFinding(finding.findingKey)
@@ -187,16 +181,17 @@ export const InvestigationsPage: React.FC = () => {
 
       {/* Summary KPI Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1: Active Outliers Volume */}
+        {/* KPI 1: Active Findings Count */}
         <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E6DF] shadow-2xs">
           <span className="text-[11px] font-mono uppercase tracking-wider text-[#788780]">
-            Spending Under Radar
+            Active Findings
           </span>
-          <div className="text-2xl font-serif font-medium text-[#16201B] mt-1.5">
-            {formatCurrency(summary.spikesTotal)}
+          <div className="text-2xl font-serif font-medium text-[#16201B] mt-1.5 flex items-baseline gap-2">
+            <span>{summary.reviewableCount}</span>
+            <span className="text-xs font-mono font-normal text-[#C97A2B]">alerts</span>
           </div>
-          <span className="text-[11px] text-[#C97A2B] mt-1 block font-mono">
-            Across {summary.reviewableCount} active investigations
+          <span className="text-[11px] text-[#62726A] mt-1 block font-mono">
+            {formatCurrency(summary.spikesTotal)} total spend
           </span>
         </div>
 
@@ -205,7 +200,7 @@ export const InvestigationsPage: React.FC = () => {
           <span className="text-[11px] font-mono uppercase tracking-wider text-[#788780]">
             High-Severity Spikes
           </span>
-          <div className="text-2xl font-serif font-medium text-[#B83A2E] mt-1.5 flex items-center gap-2">
+          <div className="text-2xl font-serif font-medium text-[#B83A2E] mt-1.5 flex items-baseline gap-2">
             <span>{summary.highSeverityCount || 0}</span>
             <span className="text-xs font-mono font-normal text-[#788780]">spikes</span>
           </div>
@@ -214,31 +209,31 @@ export const InvestigationsPage: React.FC = () => {
           </span>
         </div>
 
-        {/* KPI 3: Highest Spike Ratio */}
+        {/* KPI 3: Reviewed Findings */}
         <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E6DF] shadow-2xs">
           <span className="text-[11px] font-mono uppercase tracking-wider text-[#788780]">
-            Highest Spike Ratio
+            Reviewed Findings
           </span>
-          <div className="text-2xl font-serif font-medium text-[#16201B] mt-1.5">
-            {highestRatio > 0 ? `${highestRatio}x` : '1.0x'}
-            <span className="text-xs font-mono font-normal text-[#788780] ml-1">Normal</span>
+          <div className="text-2xl font-serif font-medium text-[#2D6A4F] mt-1.5 flex items-baseline gap-2">
+            <span>{summary.reviewedCount || 0}</span>
+            <span className="text-xs font-mono font-normal text-[#788780]">verified</span>
           </div>
           <span className="text-[11px] text-[#52796F] mt-1 block">
-            Peak historical deviation
+            {summary.dismissedCount || 0} dismissed
           </span>
         </div>
 
-        {/* KPI 4: Forensic Engine Status */}
+        {/* KPI 4: Categories Affected */}
         <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E6DF] shadow-2xs">
           <span className="text-[11px] font-mono uppercase tracking-wider text-[#788780]">
-            Investigation Status
+            Categories Affected
           </span>
-          <div className="text-2xl font-serif font-medium text-[#16201B] mt-1.5">
-            {summary.reviewedCount || 0}
-            <span className="text-xs font-mono font-normal text-[#788780] ml-1">verified</span>
+          <div className="text-2xl font-serif font-medium text-[#16201B] mt-1.5 flex items-baseline gap-2">
+            <span>{summary.categoriesAffected || 0}</span>
+            <span className="text-xs font-mono font-normal text-[#788780]">categories</span>
           </div>
-          <span className="text-[11px] text-[#2D6A4F] mt-1 block">
-            {summary.dismissedCount || 0} false positives dismissed
+          <span className="text-[11px] text-[#52796F] mt-1 block">
+            With active anomaly alerts
           </span>
         </div>
       </div>

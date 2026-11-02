@@ -133,6 +133,7 @@ export interface AnomalyFinding {
   sampleCount: number
   baselineMethod: AnomalyBaselineMethod
   comparableTransactionIds: string[]
+  ruleId?: string
   reviewStatus: AnomalyReviewStatus
   reviewedAt?: string
   userNotes?: string
@@ -155,6 +156,7 @@ export interface AnomalySummary {
   reviewedCount?: number
   dismissedCount?: number
   totalDetected?: number
+  categoriesAffected?: number
 }
 
 export interface SavingsScenario {

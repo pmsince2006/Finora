@@ -287,9 +287,18 @@ export function detectSpendingAnomalies(
       evidenceQuality = 'preliminary'
     }
 
-    // Reconcile with persisted user review decision
-    const findingKey = getDeterministicFindingKey(evaluatedTx.id)
-    const review = reviews[findingKey]
+    // Determine specific rule identifier
+    let ruleId = 'category_deviation'
+    if (baselineMethod === 'merchant') {
+      ruleId = 'merchant_deviation'
+    } else if (baselineMethod === 'personal') {
+      ruleId = 'large_expense'
+    }
+
+    // Reconcile with persisted user review decision (supports rule-specific or generic key)
+    const findingKey = getDeterministicFindingKey(evaluatedTx.id, ruleId)
+    const fallbackKey = getDeterministicFindingKey(evaluatedTx.id)
+    const review = reviews[findingKey] || reviews[fallbackKey]
 
     let reviewStatus: AnomalyReviewStatus = 'active'
     if (review?.status === 'reviewed') {
@@ -325,6 +334,7 @@ export function detectSpendingAnomalies(
       evidenceQuality,
       sampleCount,
       baselineMethod,
+      ruleId,
       comparableTransactionIds: baselineSample.map((t) => t.id),
       reviewStatus,
       reviewedAt: review?.reviewedAt,
@@ -354,6 +364,7 @@ export function detectSpendingAnomalies(
   // Aggregate values without double-counting
   const spikesTotal = activeFindings.reduce((sum, f) => sum + f.amount, 0)
   const highSeverityCount = activeFindings.filter((f) => f.severity === 'high').length
+  const categoriesAffected = new Set(activeFindings.map((f) => f.category)).size
 
   const summary: AnomalySummary = {
     reviewableCount: activeFindings.length,
@@ -363,6 +374,7 @@ export function detectSpendingAnomalies(
     reviewedCount: reviewedFindings.length,
     dismissedCount: dismissedFindings.length,
     totalDetected: allFindings.length,
+    categoriesAffected,
   }
 
   return {
@@ -371,5 +383,95 @@ export function detectSpendingAnomalies(
     activeFindings,
     reviewedFindings,
     dismissedFindings,
+  }
+}
+
+export interface CategoryPeriodComparison {
+  category: string
+  currentSpending: number
+  baselineSpending: number
+  currentDays: number
+  baselineDays: number
+  dailyCurrentRate: number
+  dailyBaselineRate: number
+  rateRatio: number
+  isProRated: boolean
+  isSurge: boolean
+}
+
+/**
+ * Compares spending in a category over comparable periods.
+ * Normalizes by period length (daily rates) to ensure a partial period
+ * is never compared directly against a complete period without adjustment.
+ */
+export function compareCategoryPeriodSpending(
+  transactions: Transaction[],
+  category: string,
+  referenceDateStr: string,
+  currentDays: number = 14,
+  baselineDays: number = 30
+): CategoryPeriodComparison {
+  if (!transactions || !Array.isArray(transactions) || currentDays <= 0 || baselineDays <= 0) {
+    return {
+      category,
+      currentSpending: 0,
+      baselineSpending: 0,
+      currentDays: Math.max(1, currentDays),
+      baselineDays: Math.max(1, baselineDays),
+      dailyCurrentRate: 0,
+      dailyBaselineRate: 0,
+      rateRatio: 1.0,
+      isProRated: true,
+      isSurge: false,
+    }
+  }
+
+  const currentStartDate = addDays(referenceDateStr, -currentDays)
+  const baselineStartDate = addDays(currentStartDate, -baselineDays)
+
+  let currentSpending = 0
+  let baselineSpending = 0
+
+  for (const t of transactions) {
+    if (
+      !t ||
+      typeof t !== 'object' ||
+      t.type !== 'expense' ||
+      t.category !== category ||
+      typeof t.amount !== 'number' ||
+      t.amount <= 0 ||
+      !isFinite(t.amount) ||
+      !t.date ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(t.date)
+    ) {
+      continue
+    }
+
+    if (t.date > currentStartDate && t.date <= referenceDateStr) {
+      currentSpending += t.amount
+    } else if (t.date > baselineStartDate && t.date <= currentStartDate) {
+      baselineSpending += t.amount
+    }
+  }
+
+  const dailyCurrentRate = Math.round((currentSpending / currentDays) * 100) / 100
+  const dailyBaselineRate = Math.round((baselineSpending / baselineDays) * 100) / 100
+  const rateRatio = dailyBaselineRate > 0
+    ? Math.round((dailyCurrentRate / dailyBaselineRate) * 10) / 10
+    : currentSpending > 0 ? 2.0 : 1.0
+
+  const isSurge = rateRatio >= 1.75 && dailyCurrentRate - dailyBaselineRate >= 200
+
+  return {
+    category,
+    currentSpending: Math.round(currentSpending),
+    baselineSpending: Math.round(baselineSpending),
+    currentDays,
+    baselineDays,
+    dailyCurrentRate,
+    dailyBaselineRate,
+    rateRatio,
+    isProRated: currentDays !== baselineDays,
+    isSurge,
   }
 }
