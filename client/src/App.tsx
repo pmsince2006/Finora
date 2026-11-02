@@ -12,44 +12,47 @@ import { SavingsPage } from './pages/app/SavingsPage'
 import { SettingsPage } from './pages/app/SettingsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { FinanceProvider } from './context/FinanceContext'
+import { ToastProvider } from './context/ToastContext'
 
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Phase 01 Preserved Public Landing Page */}
-        <Route path="/" element={<LandingPage />} />
+      <ToastProvider>
+        <Routes>
+          {/* Phase 01 Preserved Public Landing Page */}
+          <Route path="/" element={<LandingPage />} />
 
-        {/* Dedicated Dark Authentication Pages */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+          {/* Dedicated Dark Authentication Pages */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-        {/* Phase 02 Authenticated-Style Application Workspace */}
-        <Route
-          path="/app"
-          element={
-            <FinanceProvider>
-              <AppLayout />
-            </FinanceProvider>
-          }
-        >
-          {/* Default Route: Overview Dashboard */}
-          <Route index element={<OverviewPage />} />
-          {/* Money Ledger */}
-          <Route path="transactions" element={<TransactionsPage />} />
-          {/* Recurring Payment Detective */}
-          <Route path="recurring" element={<RecurringPage />} />
-          {/* Spending Anomaly Radar */}
-          <Route path="investigations" element={<InvestigationsPage />} />
-          {/* Savings Opportunity Lab */}
-          <Route path="savings" element={<SavingsPage />} />
-          {/* Settings & Local Controls */}
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
+          {/* Application Workspace with Finance Context */}
+          <Route
+            path="/app"
+            element={
+              <FinanceProvider>
+                <AppLayout />
+              </FinanceProvider>
+            }
+          >
+            {/* Default Route: Overview Dashboard */}
+            <Route index element={<OverviewPage />} />
+            {/* Money Ledger */}
+            <Route path="transactions" element={<TransactionsPage />} />
+            {/* Recurring Payment Detective */}
+            <Route path="recurring" element={<RecurringPage />} />
+            {/* Spending Anomaly Radar */}
+            <Route path="investigations" element={<InvestigationsPage />} />
+            {/* Savings Opportunity Lab */}
+            <Route path="savings" element={<SavingsPage />} />
+            {/* Settings & Local Controls */}
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
 
-        {/* 404 Catch-All Route */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          {/* 404 Catch-All Route */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </ToastProvider>
     </BrowserRouter>
   )
 }

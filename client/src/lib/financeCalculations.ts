@@ -245,7 +245,7 @@ export function calculateAnomalySummary(transactions: Transaction[]): AnomalySum
   }
 }
 
-export function calculateSavingsSummary(): SavingsSummary {
+export function calculateSavingsSummary(_transactions?: Transaction[]): SavingsSummary {
   const scenarios = DEMO_SAVINGS_SCENARIOS
   const totalIdentifiedMonthly = scenarios.reduce((sum, s) => sum + s.potentialMonthlySavings, 0)
 
