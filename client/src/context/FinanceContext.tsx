@@ -5,7 +5,6 @@ import {
   calculateSummaryMetrics,
   calculateCategoryBreakdown,
   calculateSpendingTrend,
-  calculateAnomalySummary,
   calculateSavingsSummary,
 } from '../lib/financeCalculations'
 import {
@@ -24,6 +23,17 @@ import {
   clearRecurringReviews,
   type RecurringReviewRecord,
 } from '../lib/recurringStorage'
+import {
+  detectSpendingAnomalies,
+  type AnomalyAnalysisResult,
+} from '../lib/anomalyDetection'
+import {
+  loadAnomalyReviews,
+  saveAnomalyReview,
+  removeAnomalyReview,
+  clearAnomalyReviews,
+  type AnomalyReviewRecord,
+} from '../lib/anomalyStorage'
 import { FinanceContext } from './financeContextDef'
 import type { FinanceContextType } from './financeContextDef'
 
@@ -39,6 +49,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Recurring Reviews state initialized from localStorage
   const [recurringReviews, setRecurringReviews] = useState<Record<string, RecurringReviewRecord>>(() =>
     loadRecurringReviews()
+  )
+
+  // Anomaly Reviews state initialized from localStorage
+  const [anomalyReviews, setAnomalyReviews] = useState<Record<string, AnomalyReviewRecord>>(() =>
+    loadAnomalyReviews()
   )
 
   // 1. CREATE Transaction
@@ -153,13 +168,52 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setRecurringReviews({})
   }, [])
 
-  // 7. RESET to Demo Dataset
+  // 7. SPENDING ANOMALY REVIEWS
+  const reviewAnomalyFinding = useCallback((findingKey: string) => {
+    const record: AnomalyReviewRecord = {
+      findingKey,
+      transactionId: findingKey.replace(/^anom-/, '').replace(/-[^-]+$/, ''),
+      status: 'reviewed',
+      reviewedAt: new Date().toISOString(),
+    }
+    saveAnomalyReview(record)
+    setAnomalyReviews((prev) => ({ ...prev, [findingKey]: record }))
+  }, [])
+
+  const dismissAnomalyFinding = useCallback((findingKey: string) => {
+    const record: AnomalyReviewRecord = {
+      findingKey,
+      transactionId: findingKey.replace(/^anom-/, '').replace(/-[^-]+$/, ''),
+      status: 'dismissed',
+      reviewedAt: new Date().toISOString(),
+    }
+    saveAnomalyReview(record)
+    setAnomalyReviews((prev) => ({ ...prev, [findingKey]: record }))
+  }, [])
+
+  const reinstateAnomalyFinding = useCallback((findingKey: string) => {
+    removeAnomalyReview(findingKey)
+    setAnomalyReviews((prev) => {
+      const next = { ...prev }
+      delete next[findingKey]
+      return next
+    })
+  }, [])
+
+  const resetAnomalyReviews = useCallback(() => {
+    clearAnomalyReviews()
+    setAnomalyReviews({})
+  }, [])
+
+  // 8. RESET to Demo Dataset
   const resetToDemo = useCallback(() => {
     const fresh = getFreshDemoTransactions()
     setTransactions(fresh)
     saveTransactionsToStorage(fresh)
     clearRecurringReviews()
     setRecurringReviews({})
+    clearAnomalyReviews()
+    setAnomalyReviews({})
   }, [])
 
   // Modal helpers
@@ -202,9 +256,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const recurringSummary = recurringAnalysis.summary
 
-  const anomalySummary = useMemo(() => {
-    return calculateAnomalySummary(transactions)
-  }, [transactions])
+  // Pure deterministic Spending Anomaly Radar engine
+  const anomalyAnalysis: AnomalyAnalysisResult = useMemo(() => {
+    return detectSpendingAnomalies(transactions, anomalyReviews)
+  }, [transactions, anomalyReviews])
+
+  const anomalySummary = anomalyAnalysis.summary
 
   // Synchronized savings summary
   const savingsSummary = useMemo(() => {
@@ -232,6 +289,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     reinstateRecurringCandidate,
     resetRecurringReviews,
     anomalySummary,
+    anomalyAnalysis,
+    reviewAnomalyFinding,
+    dismissAnomalyFinding,
+    reinstateAnomalyFinding,
+    resetAnomalyReviews,
     savingsSummary,
     isAddTxModalOpen,
     editingTransaction,

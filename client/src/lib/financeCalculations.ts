@@ -7,11 +7,12 @@ import type {
   RecurringSummary,
   AnomalySummary,
   SavingsSummary,
-  AnomalyFinding,
 } from '../types/finance'
 import { DEMO_SAVINGS_SCENARIOS } from '../data/demoTransactions'
 import { detectRecurringPayments } from './recurringDetection'
 import type { RecurringReviewRecord } from './recurringStorage'
+import { detectSpendingAnomalies } from './anomalyDetection'
+import type { AnomalyReviewRecord } from './anomalyStorage'
 
 /**
  * Finora Core Financial Calculation Engine
@@ -206,33 +207,15 @@ export function calculateRecurringSummary(
   return analysis.summary
 }
 
-export function calculateAnomalySummary(transactions: Transaction[]): AnomalySummary {
-  const findings: AnomalyFinding[] = []
-  let spikesTotal = 0
-
-  for (const t of transactions) {
-    if (t.isAnomaly && t.type === 'expense') {
-      spikesTotal += t.amount
-      findings.push({
-        id: t.id,
-        merchant: t.description,
-        category: t.category,
-        amount: t.amount,
-        baselineAmount: t.baselineAmount || Math.round(t.amount * 0.3),
-        ratio: t.baselineAmount ? Number((t.amount / t.baselineAmount).toFixed(1)) : 3.5,
-        severity: t.anomalySeverity || 'medium',
-        reason: t.anomalyReason || 'Statistical outlier compared to running category average',
-        date: t.date,
-      })
-    }
-  }
-
-  return {
-    reviewableCount: findings.length,
-    spikesTotal,
-    findings,
-  }
+export function calculateAnomalySummary(
+  transactions: Transaction[],
+  reviews?: Record<string, AnomalyReviewRecord>
+): AnomalySummary {
+  const analysis = detectSpendingAnomalies(transactions, reviews)
+  return analysis.summary
 }
+
+// Dynamic Anomaly Detection Engine active
 
 export function calculateSavingsSummary(_transactions?: Transaction[]): SavingsSummary {
   void _transactions

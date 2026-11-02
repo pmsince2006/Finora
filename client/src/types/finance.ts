@@ -4,6 +4,12 @@ export type TransactionStatus = 'verified' | 'flagged' | 'recurring' | 'regular'
 
 export type AnomalySeverity = 'low' | 'medium' | 'high'
 
+export type AnomalyEvidenceQuality = 'high' | 'moderate' | 'preliminary'
+
+export type AnomalyReviewStatus = 'active' | 'reviewed' | 'dismissed'
+
+export type AnomalyBaselineMethod = 'merchant' | 'category' | 'personal'
+
 export type RecurringCadence =
   | 'Weekly'
   | 'Fortnightly'
@@ -111,6 +117,8 @@ export interface RecurringSummary {
 
 export interface AnomalyFinding {
   id: string
+  findingKey: string
+  transactionId: string
   merchant: string
   category: string
   amount: number
@@ -119,12 +127,34 @@ export interface AnomalyFinding {
   severity: AnomalySeverity
   reason: string
   date: string
+  // Phase 05 extensions
+  absoluteDeviation: number
+  evidenceQuality: AnomalyEvidenceQuality
+  sampleCount: number
+  baselineMethod: AnomalyBaselineMethod
+  comparableTransactionIds: string[]
+  reviewStatus: AnomalyReviewStatus
+  reviewedAt?: string
+  userNotes?: string
+  // Statistical details for forensic inspection
+  stats?: {
+    mean: number
+    median: number
+    stdDev: number
+    mad: number
+    windowDays: number
+  }
 }
 
 export interface AnomalySummary {
   reviewableCount: number
   spikesTotal: number
   findings: AnomalyFinding[]
+  // Phase 05 extensions
+  highSeverityCount?: number
+  reviewedCount?: number
+  dismissedCount?: number
+  totalDetected?: number
 }
 
 export interface SavingsScenario {
