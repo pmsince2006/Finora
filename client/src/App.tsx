@@ -1,87 +1,50 @@
-import React, { useState } from 'react'
-import { Navbar } from './components/common/Navbar'
-import { Hero } from './components/landing/Hero'
-import { DashboardPreview } from './components/landing/DashboardPreview'
-import { HowItWorks } from './components/landing/HowItWorks'
-import { FeatureShowcase } from './components/landing/FeatureShowcase'
-import { InteractiveScenarioTester } from './components/landing/InteractiveScenarioTester'
-import { ClosingCTA } from './components/landing/ClosingCTA'
-import { Footer } from './components/common/Footer'
-import { AuthPlaceholderModal } from './components/common/AuthPlaceholderModal'
+import React from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { LandingPage } from './pages/LandingPage'
+import { AppLayout } from './components/app/AppLayout'
+import { OverviewPage } from './pages/app/OverviewPage'
+import { TransactionsPage } from './pages/app/TransactionsPage'
+import { RecurringPage } from './pages/app/RecurringPage'
+import { InvestigationsPage } from './pages/app/InvestigationsPage'
+import { SavingsPage } from './pages/app/SavingsPage'
+import { SettingsPage } from './pages/app/SettingsPage'
+import { NotFoundPage } from './pages/NotFoundPage'
+import { FinanceProvider } from './context/FinanceContext'
 
 export const App: React.FC = () => {
-  const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('register')
-
-  const handleOpenAuth = (mode: 'login' | 'register') => {
-    setAuthModalMode(mode)
-    setAuthModalOpen(true)
-  }
-
-  const handleCloseAuth = () => {
-    setAuthModalOpen(false)
-  }
-
-  const handleJumpToPreview = () => {
-    const el = document.getElementById('preview')
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-[#FBFBFA] text-[#16201B] font-sans flex flex-col selection:bg-[#153326] selection:text-[#F2F7F4]">
-      {/* Editorial Navigation */}
-      <Navbar
-        onOpenAuth={handleOpenAuth}
-        onJumpToPreview={handleJumpToPreview}
-      />
+    <BrowserRouter>
+      <Routes>
+        {/* Phase 01 Preserved Public Landing Page */}
+        <Route path="/" element={<LandingPage />} />
 
-      {/* Main Content Area */}
-      <main className="flex-1">
-        {/* Hero Section with Editorial Headline */}
-        <Hero
-          onStartInvestigating={() => handleOpenAuth('register')}
-          onExploreProduct={handleJumpToPreview}
-        />
+        {/* Phase 02 Authenticated-Style Application Workspace */}
+        <Route
+          path="/app"
+          element={
+            <FinanceProvider>
+              <AppLayout />
+            </FinanceProvider>
+          }
+        >
+          {/* Default Route: Overview Dashboard */}
+          <Route index element={<OverviewPage />} />
+          {/* Money Ledger */}
+          <Route path="transactions" element={<TransactionsPage />} />
+          {/* Recurring Payment Detective */}
+          <Route path="recurring" element={<RecurringPage />} />
+          {/* Spending Anomaly Radar */}
+          <Route path="investigations" element={<InvestigationsPage />} />
+          {/* Savings Opportunity Lab */}
+          <Route path="savings" element={<SavingsPage />} />
+          {/* Settings & Local Controls */}
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
 
-        {/* Centerpiece Layered Dashboard Preview */}
-        <DashboardPreview
-          onInteract={() => {
-            const el = document.getElementById('features')
-            if (el) el.scrollIntoView({ behavior: 'smooth' })
-          }}
-        />
-
-        {/* 3-Step Forensic Workflow */}
-        <HowItWorks />
-
-        {/* Four Dedicated Feature Showcases */}
-        <FeatureShowcase />
-
-        {/* Live Interactive Savings Opportunity Sandbox */}
-        <InteractiveScenarioTester
-          onCommitPlan={() => handleOpenAuth('register')}
-        />
-
-        {/* Closing Action Banner */}
-        <ClosingCTA
-          onStartInvestigating={() => handleOpenAuth('register')}
-          onExploreDemo={handleJumpToPreview}
-        />
-      </main>
-
-      {/* Editorial Footer */}
-      <Footer />
-
-      {/* Auth & Preview Gateway Modal */}
-      <AuthPlaceholderModal
-        isOpen={authModalOpen}
-        onClose={handleCloseAuth}
-        initialMode={authModalMode}
-        onExploreDemo={handleJumpToPreview}
-      />
-    </div>
+        {/* 404 Catch-All Route */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

@@ -5,9 +5,10 @@ import { BrandLogo } from './BrandLogo'
 interface NavbarProps {
   onOpenAuth: (mode: 'login' | 'register') => void
   onJumpToPreview: () => void
+  onOpenApp?: () => void
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth, onJumpToPreview }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth, onJumpToPreview, onOpenApp }) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -70,6 +71,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth, onJumpToPreview }) =
 
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            {onOpenApp && (
+              <button
+                onClick={onOpenApp}
+                className="text-xs font-mono font-medium text-[#153326] bg-[#E3ECE8] hover:bg-[#D4D4CA] px-3.5 py-2 rounded-xl transition-colors border border-[#C2D3CC]"
+              >
+                Launch App
+              </button>
+            )}
             <button
               onClick={() => onOpenAuth('login')}
               className="text-xs font-medium text-[#35423B] hover:text-[#0E241B] px-3.5 py-2 rounded-xl transition-colors"
@@ -112,6 +121,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth, onJumpToPreview }) =
               </a>
             ))}
             <div className="pt-3 border-t border-[#E6E6DF] flex flex-col gap-2">
+              {onOpenApp && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    onOpenApp()
+                  }}
+                  className="w-full text-center px-4 py-2.5 text-xs font-mono font-medium text-[#153326] bg-[#E3ECE8] rounded-xl hover:bg-[#D4D4CA] transition-colors border border-[#C2D3CC]"
+                >
+                  Launch Interactive App
+                </button>
+              )}
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
