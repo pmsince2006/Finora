@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Newsreader", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-warm-bg: #FBFBFA;
+  --color-warm-surface: #FFFFFF;
+  --color-warm-muted: #F5F5F0;
+  --color-warm-border: #E6E6DF;
+  --color-warm-stone: #D4D4CA;
+
+  --color-forest-950: #0A1C15;
+  --color-forest-900: #0E241B;
+  --color-forest-800: #153326;
+  --color-forest-700: #1B4332;
+  --color-forest-600: #2D6A4F;
+
+  --color-sage-600: #405F57;
+  --color-sage-500: #52796F;
+  --color-sage-400: #74968C;
+  --color-sage-300: #9DB4AC;
+  --color-sage-200: #C2D3CC;
+  --color-sage-100: #E3ECE8;
+  --color-sage-50: #F2F7F4;
+
+  --color-ink-950: #0C120F;
+  --color-ink-900: #16201B;
+  --color-ink-800: #24302A;
+  --color-ink-700: #35423B;
+  --color-ink-600: #4B5952;
+  --color-ink-500: #62726A;
+  --color-ink-400: #788780;
+  --color-ink-300: #A2B0A9;
+  --color-ink-200: #CBD5D0;
+  --color-ink-100: #E7ECE9;
+
+  --color-alert-amber: #C97A2B;
+  --color-alert-amber-bg: #FCF4EB;
+  --color-alert-red: #B83A2E;
+  --color-alert-red-bg: #FDF1EF;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--color-warm-bg);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Custom scrollbar for preview widgets */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4D4CA;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A2B0A9;
+}
