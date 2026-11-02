@@ -121,7 +121,7 @@ export const OverviewPage: React.FC = () => {
       >
         <div className="flex items-center gap-2">
           <span className="font-mono text-[#153326] font-semibold tracking-wider">
-            [SPENDSLEUTH LAB // CASE #4029]
+            [FINORA LAB // CASE #4029]
           </span>
           <span className="text-[#D4D4CA]">•</span>
           <span>Subject: Alex Morrison (SWE Intern &amp; Graduate Student)</span>

@@ -1,8 +1,8 @@
 {
-  "name": "spendsleuth",
+  "name": "finora",
   "version": "1.0.0",
   "private": true,
-  "description": "SpendSleuth — Premium Personal Finance Intelligence Platform",
+  "description": "Finora — Personal Finance Intelligence Platform",
   "scripts": {
     "dev": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
@@ -15,7 +15,7 @@
     "money-ledger",
     "anomaly-radar"
   ],
-  "author": "SpendSleuth Team",
+  "author": "Finora Team",
   "license": "UNLICENSED",
   "dependencies": {
     "react-router-dom": "^7.18.5"

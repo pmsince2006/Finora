@@ -1,5 +1,5 @@
 /**
- * SpendSleuth Authentication Service (Client-Side Interface)
+ * Finora Authentication Service (Client-Side Interface)
  * 
  * Provides client-side validation and authentication state definitions.
  * Real server-managed endpoints (JWT in HTTP-only cookies / Bearer auth)
@@ -83,5 +83,5 @@ export function validateLogin(email: string, password: string): ValidationResult
 export const AUTH_SYSTEM_STATUS = {
   isBackendConnected: false,
   message:
-    'SpendSleuth is currently operating in local preview mode. Server-managed authentication will connect with the backend service.',
+    'Finora is currently operating in local preview mode. Server-managed authentication will connect with the backend service.',
 }

@@ -108,7 +108,7 @@ export const AuthPlaceholderModal: React.FC<AuthPlaceholderModalProps> = ({
             <div className="w-12 h-12 rounded-full bg-[#E3ECE8] text-[#1B4332] flex items-center justify-center mx-auto mb-3">
               <UserCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-serif font-medium text-[#16201B]">Welcome to SpendSleuth Preview</h3>
+            <h3 className="text-base font-serif font-medium text-[#16201B]">Welcome to Finora Preview</h3>
             <p className="text-xs text-[#62726A] mt-1 mb-5">
               Your preview request is noted. Click below to inspect the interactive forensic dashboard immediately.
             </p>

@@ -90,7 +90,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
       <div className="flex flex-col sm:flex-row items-center justify-between pb-4 border-b border-[#E6E6DF] mb-6 text-xs text-[#62726A]">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[#153326] font-semibold tracking-wider">
-            [SPENDSLEUTH DEMO PREVIEW]
+            [FINORA DEMO PREVIEW]
           </span>
           <span className="hidden sm:inline text-[#D4D4CA]">|</span>
           <span className="hidden sm:inline">Profile: Alex M. (Student &amp; SWE Intern)</span>
@@ -116,7 +116,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
             <div className="w-2.5 h-2.5 rounded-full bg-[#E6E6DF] border border-[#D4D4CA]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#E6E6DF] border border-[#D4D4CA]" />
             <span className="ml-3 text-xs font-mono text-[#788780] hidden sm:inline">
-              spendsleuth.app/overview
+              finora.app/overview
             </span>
           </div>
 
@@ -437,11 +437,11 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ onInteract }
         {/* Floating Annotation Pill (Echoing the Steep reference cursor card) */}
         <div className="hidden lg:flex absolute bottom-8 right-8 z-30 max-w-sm p-4 rounded-xl bg-[#FFFFFF] border border-[#153326]/20 shadow-xl items-start gap-3">
           <div className="w-7 h-7 rounded-full bg-[#153326] text-[#E3ECE8] flex items-center justify-center font-mono text-xs shrink-0 mt-0.5 font-bold">
-            SL
+            FN
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-[#16201B]">SpendSleuth Guide</span>
+              <span className="text-xs font-semibold text-[#16201B]">Finora Guide</span>
               <span className="text-[10px] font-mono text-[#788780]">Apr 28</span>
             </div>
             <p className="text-xs text-[#4B5952] mt-0.5 leading-relaxed">

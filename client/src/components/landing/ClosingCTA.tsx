@@ -37,7 +37,7 @@ export const ClosingCTA: React.FC<ClosingCTAProps> = ({
           </h2>
 
           <p className="max-w-xl mx-auto text-sm sm:text-base text-[#4B5952] leading-relaxed">
-            Import your recent transactions from a CSV file or explore the sample student demo to see how SpendSleuth brings clarity to your everyday spending.
+            Import your recent transactions from a CSV file or explore the sample student demo to see how Finora brings clarity to your everyday spending.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">

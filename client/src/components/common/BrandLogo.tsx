@@ -4,12 +4,14 @@ interface BrandLogoProps {
   className?: string
   showTagline?: boolean
   size?: 'sm' | 'md' | 'lg'
+  inverted?: boolean
 }
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   className = '',
   showTagline = false,
   size = 'md',
+  inverted = false,
 }) => {
   const iconSizes = {
     sm: 'w-7 h-7',
@@ -25,9 +27,11 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* Sleuth Reticle Symbol */}
+      {/* Finora Reticle Symbol */}
       <div
-        className={`${iconSizes[size]} rounded-lg bg-[#153326] flex items-center justify-center shadow-xs transition-transform hover:scale-105 duration-200 shrink-0`}
+        className={`${iconSizes[size]} rounded-lg ${
+          inverted ? 'bg-[#142B20] border border-[#193224]' : 'bg-[#153326]'
+        } flex items-center justify-center shadow-xs transition-transform hover:scale-105 duration-200 shrink-0`}
         aria-hidden="true"
       >
         <svg
@@ -51,11 +55,19 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       </div>
 
       <div className="flex flex-col text-left">
-        <span className={`${textSizes[size]} font-sans font-semibold tracking-tight text-[#16201B] leading-none`}>
-          Spend<span className="font-serif italic font-normal text-[#1B4332] ml-0.5">Sleuth</span>
+        <span
+          className={`${textSizes[size]} font-sans font-semibold tracking-tight leading-none ${
+            inverted ? 'text-[#FFFFFF]' : 'text-[#16201B]'
+          }`}
+        >
+          Fin<span className={`font-serif italic font-normal ml-0.5 ${inverted ? 'text-[#4EAC85]' : 'text-[#1B4332]'}`}>ora</span>
         </span>
         {showTagline && (
-          <span className="text-[10px] uppercase font-mono tracking-wider text-[#62726A] mt-0.5">
+          <span
+            className={`text-[10px] uppercase font-mono tracking-wider mt-0.5 ${
+              inverted ? 'text-[#8B9E94]' : 'text-[#62726A]'
+            }`}
+          >
             Finance Intelligence
           </span>
         )}

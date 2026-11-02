@@ -20,7 +20,7 @@ export const NotFoundPage: React.FC = () => {
         </h1>
 
         <p className="text-xs text-[#62726A] mt-2 leading-relaxed">
-          The requested coordinate or ledger path does not exist in the SpendSleuth investigation database.
+          The requested coordinate or ledger path does not exist in the Finora database.
         </p>
 
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">

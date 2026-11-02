@@ -1,7 +1,7 @@
 import type { Transaction, RecurringCandidate, SavingsScenario } from '../types/finance'
 
 /**
- * SpendSleuth Deterministic Forensic Demo Dataset
+ * Finora Deterministic Forensic Demo Dataset
  * Case File: #4029
  * Profile: Alex Morrison (Graduate Student & SWE Intern)
  * Currency: INR (Indian Rupees ₹)

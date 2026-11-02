@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-5 space-y-4">
             <BrandLogo size="md" showTagline />
             <p className="text-xs text-[#4B5952] max-w-sm leading-relaxed">
-              SpendSleuth helps students and young professionals understand their money by tracking everyday expenses, uncovering recurring subscriptions, and finding realistic ways to save.
+              Finora helps students and young professionals understand their money by tracking everyday expenses, uncovering recurring subscriptions, and finding realistic ways to save.
             </p>
             <div className="p-3 rounded-xl bg-[#F5F5F0] border border-[#E6E6DF] inline-flex items-center gap-2.5 text-[11px] text-[#35423B]">
               <Shield className="w-4 h-4 text-[#2D6A4F] shrink-0" />
@@ -66,7 +66,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#788780]">
           <div>
-            © 2026 SpendSleuth. Personal Finance Intelligence. All rights reserved.
+            © 2026 Finora. Personal Finance Intelligence. All rights reserved.
           </div>
           <div className="flex items-center gap-6">
             <a href="#how-it-works" className="hover:text-[#16201B] transition-colors">

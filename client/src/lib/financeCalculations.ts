@@ -12,7 +12,7 @@ import type {
 import { DEMO_RECURRING_CANDIDATES, DEMO_SAVINGS_SCENARIOS } from '../data/demoTransactions'
 
 /**
- * SpendSleuth Core Financial Calculation Engine
+ * Finora Core Financial Calculation Engine
  * 
  * Rules & Accounting Assumptions:
  * 1. Sign Convention: Amounts are positive floats/integers.

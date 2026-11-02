@@ -27,7 +27,7 @@ export const FeatureShowcase: React.FC = () => {
       title: 'Money Ledger',
       subtitle: 'See your income and expenses in one clean place.',
       description:
-        'Add your transactions manually or import a standard CSV file from your bank. SpendSleuth organizes everything clearly so you always know where your money goes.',
+        'Add your transactions manually or import a standard CSV file from your bank. Finora organizes everything clearly so you always know where your money goes.',
       highlights: [
         'Accurate calculations with no rounding discrepancies',
         'Simple CSV import with automatic column detection',
@@ -59,7 +59,7 @@ export const FeatureShowcase: React.FC = () => {
       title: 'Spending Anomaly Radar',
       subtitle: 'Spot spending that is higher than usual and see what changed.',
       description:
-        'Rather than confusing charts, SpendSleuth compares purchases against your typical category averages. When an unusually high charge occurs, it gives you a clear, plain-language reason.',
+        'Rather than confusing charts, Finora compares purchases against your typical category averages. When an unusually high charge occurs, it gives you a clear, plain-language reason.',
       highlights: [
         'Highlights purchases that are significantly higher than normal',
         'Spots short-term spending spikes over a few days',
@@ -107,7 +107,7 @@ export const FeatureShowcase: React.FC = () => {
             </span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-[#4B5952] leading-relaxed">
-            SpendSleuth brings transaction tracking, subscription detection, spending alerts, and savings planning together into one unified experience.
+            Finora brings transaction tracking, subscription detection, spending alerts, and savings planning together into one unified experience.
           </p>
         </div>
 
@@ -208,7 +208,7 @@ export const FeatureShowcase: React.FC = () => {
                     <span>Automatic Duplicate Detection</span>
                   </div>
                   <p className="text-[11px] text-[#4B5952] mt-1">
-                    SpendSleuth checks dates, amounts, and descriptions to ensure no transaction is imported twice.
+                    Finora checks dates, amounts, and descriptions to ensure no transaction is imported twice.
                   </p>
                 </div>
               </div>

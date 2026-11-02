@@ -1,5 +1,5 @@
 /**
- * SpendSleuth Currency Formatter
+ * Finora Currency Formatter
  * Formats financial values in Indian Rupees (INR) using standard Intl.NumberFormat conventions.
  */
 

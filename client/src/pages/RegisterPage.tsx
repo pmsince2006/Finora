@@ -47,7 +47,7 @@ export const RegisterPage: React.FC = () => {
       {/* Top minimal bar */}
       <header className="px-6 py-5 border-b border-[#14261D] max-w-7xl mx-auto w-full flex items-center justify-between">
         <Link to="/" className="inline-flex items-center gap-2 group">
-          <BrandLogo size="md" showTagline />
+          <BrandLogo size="md" showTagline inverted />
         </Link>
         <Link
           to="/"
@@ -285,7 +285,7 @@ export const RegisterPage: React.FC = () => {
                 A clear, calm view of your finances.
               </h2>
               <p className="text-xs text-[#8B9E94] mt-1.5 leading-relaxed">
-                SpendSleuth helps students and early career professionals build lasting financial clarity.
+                Finora helps students and early career professionals build lasting financial clarity.
               </p>
 
               {/* 3 Core Points in simple language */}
@@ -329,7 +329,7 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <div className="text-[11px] text-[#506359] font-mono">
-              SpendSleuth • Indian Rupee (₹) Standard
+              Finora • Indian Rupee (₹) Standard
             </div>
           </div>
         </div>
@@ -337,7 +337,7 @@ export const RegisterPage: React.FC = () => {
 
       {/* Minimal Footer */}
       <footer className="px-6 py-4 border-t border-[#14261D] text-center text-xs text-[#506359]">
-        © 2026 SpendSleuth. Personal Finance Intelligence. Private and secure.
+        © 2026 Finora. Personal Finance Intelligence. Private and secure.
       </footer>
     </div>
   )

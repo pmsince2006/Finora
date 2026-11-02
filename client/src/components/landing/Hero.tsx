@@ -77,7 +77,7 @@ export const Hero: React.FC<HeroProps> = ({ onStartInvestigating, onExploreProdu
             variants={itemVariants}
             className="mt-6 text-base sm:text-lg text-[#4B5952] max-w-2xl font-normal leading-relaxed text-balance"
           >
-            SpendSleuth helps you understand your money by finding recurring subscriptions, spotting unusually high spending, and exploring realistic ways to save.
+            Finora helps you understand your money by finding recurring subscriptions, spotting unusually high spending, and exploring realistic ways to save.
           </motion.p>
 
           {/* Primary & Secondary Call to Actions */}

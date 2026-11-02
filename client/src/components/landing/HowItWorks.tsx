@@ -24,7 +24,7 @@ export const HowItWorks: React.FC = () => {
       title: 'Find spending patterns',
       subtitle: 'Repeated bills & unusual purchases',
       description:
-        'SpendSleuth reviews your history to spot payments that repeat on a regular schedule and highlights purchases that look higher than your typical average.',
+        'Finora reviews your history to spot payments that repeat on a regular schedule and highlights purchases that look higher than your typical average.',
       features: [
         'Finds weekly, monthly, and annual bills',
         'Flags purchases that are unusually high',
@@ -69,7 +69,7 @@ export const HowItWorks: React.FC = () => {
             </span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-[#4B5952] leading-relaxed">
-            SpendSleuth turns your everyday purchases into simple, actionable insights in three easy steps.
+            Finora turns your everyday purchases into simple, actionable insights in three easy steps.
           </p>
         </div>
 
