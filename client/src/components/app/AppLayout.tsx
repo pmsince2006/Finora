@@ -395,7 +395,22 @@ export const AppLayout: React.FC = () => {
 
         {/* Main Routed Page Content */}
         <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
-          <Outlet />
+          <React.Suspense
+            fallback={
+              <div
+                className="min-h-[40vh] flex items-center justify-center p-8 text-xs font-mono text-[#62726A]"
+                role="status"
+                aria-live="polite"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#153326] animate-pulse" />
+                  <span>Loading view...</span>
+                </div>
+              </div>
+            }
+          >
+            <Outlet />
+          </React.Suspense>
         </main>
       </div>
 

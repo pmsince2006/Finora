@@ -47,7 +47,7 @@ export const SavingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Honest Roadmap Notice for Phase 05 */}
+      {/* Honest Roadmap Notice for Phase 06 */}
       <div className="p-4 rounded-2xl bg-[#F2F7F4] border border-[#C2D3CC] text-xs text-[#1B4332] flex items-start gap-3">
         <Sparkles className="w-5 h-5 text-[#2D6A4F] shrink-0 mt-0.5" />
         <div>
@@ -55,7 +55,7 @@ export const SavingsPage: React.FC = () => {
             Phase 02 Interactive Preview Active
           </strong>
           <p className="text-[11px] text-[#35423B] mt-0.5 leading-relaxed">
-            The opportunity simulation below models high-impact student levers. In <strong>Phase 05 (Savings Lab Engine)</strong>, we will implement dynamic plan commitments, goal-linked emergency fund tracking, and category-by-category burn rate targets.
+            The opportunity simulation below models high-impact student levers. In <strong>Phase 06: Savings Opportunity Lab</strong>, we will implement dynamic plan commitments, goal-linked emergency fund tracking, and category-by-category burn rate targets.
           </p>
         </div>
       </div>

@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
-    "lint": "npm run lint --prefix client"
+    "lint": "npm run lint --prefix client",
+    "test": "npm run test --prefix client"
   },
   "keywords": [
     "personal-finance",
@@ -19,8 +20,5 @@
     "anomaly-radar"
   ],
   "author": "Finora Team",
-  "license": "UNLICENSED",
-  "dependencies": {
-    "react-router-dom": "^7.18.5"
-  }
+  "license": "UNLICENSED"
 }
