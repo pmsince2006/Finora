@@ -398,10 +398,29 @@ export const SavingsPage: React.FC = () => {
                             +{formatCurrency(opp.potentialAnnualSavings)}/yr
                           </div>
                         </div>
+                      ) : opp.type === 'recurring_review' ? (
+                        <div className="text-right shrink-0">
+                          <div className="text-sm font-mono font-medium text-[#1E3A8A]">
+                            {formatCurrency(opp.currentMonthlySpend ?? 0)}
+                            <span className="text-[10px] text-[#6B7280]">/mo</span>
+                          </div>
+                          <div className="text-[10px] font-mono text-[#6B7280]">
+                            Active Outflow
+                          </div>
+                        </div>
+                      ) : opp.type === 'merchant_concentration' ? (
+                        <div className="text-right shrink-0">
+                          <div className="text-sm font-mono font-medium text-[#374151]">
+                            {opp.sourceRecordCount} orders
+                          </div>
+                          <div className="text-[10px] font-mono text-[#6B7280]">
+                            {formatCurrency(opp.currentMonthlySpend ?? 0)} spend
+                          </div>
+                        </div>
                       ) : (
                         <div className="text-right shrink-0">
                           <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E]">
-                            Audit Check
+                            Invoice Audit
                           </span>
                         </div>
                       )}
