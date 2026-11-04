@@ -1,4 +1,5 @@
 export const SAVINGS_REVIEWS_STORAGE_KEY = 'finora.savingsReviews.v1'
+export const LEGACY_SAVINGS_PLANS_KEY = 'finora_savings_plans_v1'
 export const SAVINGS_REVIEWS_CORRUPT_BACKUP_KEY = 'finora.savingsReviews.v1.corrupt_backup'
 
 export interface SavingsReviewRecord {
@@ -32,8 +33,12 @@ export function loadSavingsReviews(): Record<string, SavingsReviewRecord> {
       return {}
     }
 
-    const raw = window.localStorage.getItem(SAVINGS_REVIEWS_STORAGE_KEY)
-    if (!raw) return {}
+    let raw = window.localStorage.getItem(SAVINGS_REVIEWS_STORAGE_KEY)
+    if (!raw) {
+      // Check legacy savings plans key for safe idempotent backward compatibility
+      raw = window.localStorage.getItem(LEGACY_SAVINGS_PLANS_KEY)
+      if (!raw) return {}
+    }
 
     let parsed: unknown
     try {

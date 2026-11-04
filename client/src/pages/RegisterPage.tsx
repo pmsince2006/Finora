@@ -4,9 +4,12 @@ import { Eye, EyeOff, ArrowLeft, ArrowRight, ShieldCheck, AlertCircle, Sparkles 
 import { BrandLogo } from '../components/common/BrandLogo'
 import { validateRegistration } from '../services/authService'
 import { AuthShell } from '../components/auth/AuthShell'
+import { useAuth } from '../context/useAuth'
+import { ApiError } from '../lib/api'
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate()
+  const { register } = useAuth()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -17,7 +20,7 @@ export const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatusMessage(null)
 
@@ -30,13 +33,15 @@ export const RegisterPage: React.FC = () => {
     setErrors({})
     setIsLoading(true)
 
-    // Simulate validation verification without claiming fake database connection
-    setTimeout(() => {
+    try {
+      await register(fullName, email, password)
+      navigate('/app')
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : 'Registration failed. Please try again.'
+      setErrors({ form: msg })
+    } finally {
       setIsLoading(false)
-      setStatusMessage(
-        'Account details verified. Persistent user accounts will be created when the server database is connected. You can test the full interactive demo workspace below right now.'
-      )
-    }, 400)
+    }
   }
 
   const handleEnterDemo = () => {
@@ -91,6 +96,14 @@ export const RegisterPage: React.FC = () => {
             <span>Enter Interactive Workspace</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
+        </div>
+      )}
+
+      {/* Error message from server */}
+      {errors.form && (
+        <div className="mb-3 p-3 rounded-xl bg-[#2D1214]/90 border border-[#7F1D1D] text-xs text-[#FCA5A5] flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-[#EF4444] shrink-0" />
+          <span>{errors.form}</span>
         </div>
       )}
 

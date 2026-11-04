@@ -14,9 +14,11 @@ import {
   ExternalLink,
   RotateCcw,
   ShieldAlert,
+  LogOut,
 } from 'lucide-react'
 import { BrandLogo } from '../common/BrandLogo'
 import { useFinance } from '../../context/useFinance'
+import { useAuth } from '../../context/useAuth'
 import { AddTransactionModal } from './AddTransactionModal'
 import { ImportModal } from './ImportModal'
 import type { PeriodFilter } from '../../types/finance'
@@ -39,6 +41,7 @@ export const AppLayout: React.FC = () => {
     recurringSummary,
     anomalySummary,
   } = useFinance()
+  const { user, isAuthenticated, logout } = useAuth()
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -197,21 +200,36 @@ export const AppLayout: React.FC = () => {
           <div className="p-3 rounded-xl bg-[#FBFBFA] border border-[#E6E6DF] flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-full bg-[#153326] text-[#E3ECE8] flex items-center justify-center font-serif text-xs font-medium shrink-0">
-                AM
+                {user ? user.fullName.slice(0, 2).toUpperCase() : 'AM'}
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-medium text-[#16201B] truncate">Alex Morrison</div>
-                <div className="text-[10px] text-[#62726A] truncate">Student &amp; SWE Intern</div>
+                <div className="text-xs font-medium text-[#16201B] truncate">
+                  {user ? user.fullName : 'Alex Morrison'}
+                </div>
+                <div className="text-[10px] text-[#62726A] truncate">
+                  {user ? user.email : 'Local Demo Account'}
+                </div>
               </div>
             </div>
-            <button
-              onClick={resetToDemo}
-              title="Reset in-memory demo data"
-              className="p-1.5 rounded-lg text-[#788780] hover:text-[#16201B] hover:bg-[#E6E6DF] transition-colors shrink-0"
-              aria-label="Reset demo dataset"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={() => logout()}
+                title="Sign out of Finora"
+                className="p-1.5 rounded-lg text-[#788780] hover:text-[#DC2626] hover:bg-[#FEE2E2] transition-colors shrink-0 cursor-pointer"
+                aria-label="Sign out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <button
+                onClick={resetToDemo}
+                title="Reset in-memory demo data"
+                className="p-1.5 rounded-lg text-[#788780] hover:text-[#16201B] hover:bg-[#E6E6DF] transition-colors shrink-0 cursor-pointer"
+                aria-label="Reset demo dataset"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Return to Public Website */}
@@ -337,8 +355,10 @@ export const AppLayout: React.FC = () => {
               <span className="font-mono text-[10px] uppercase tracking-wider text-[#52796F] bg-[#E3ECE8] px-2 py-0.5 rounded">
                 FORENSIC LEDGER // CASE #4029
               </span>
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#2D6A4F]" />
-              <span className="font-mono text-[10px] text-[#2D6A4F]">DEMO DATASET</span>
+              <span className={`inline-block w-1.5 h-1.5 rounded-full ${isAuthenticated ? 'bg-[#10B981]' : 'bg-[#D97706]'}`} />
+              <span className={`font-mono text-[10px] ${isAuthenticated ? 'text-[#047857]' : 'text-[#B45309]'}`}>
+                {isAuthenticated ? 'SECURE USER LEDGER' : 'DEMO DATASET'}
+              </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-serif font-medium text-[#16201B] mt-1 tracking-tight">
               {headerMeta.title}

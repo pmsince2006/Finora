@@ -58,6 +58,9 @@ export interface FinanceContextType {
   openImportModal: () => void
   closeImportModal: () => void
   isUsingFallback: boolean
+  isCloudSynced?: boolean
+  isLoadingCloudData?: boolean
+  seedDemoDataToAccount?: () => Promise<void>
 }
 
 export const FinanceContext = createContext<FinanceContextType | undefined>(undefined)

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import type { Transaction, PeriodFilter } from '../types/finance'
 import {
   filterTransactionsByPeriod,
@@ -46,8 +46,14 @@ import {
 } from '../lib/savingsStorage'
 import { FinanceContext } from './financeContextDef'
 import type { FinanceContextType } from './financeContextDef'
+import { useAuth } from './useAuth'
+import { api } from '../lib/api'
 
 export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, user } = useAuth()
+  const [isLoadingCloudData, setIsLoadingCloudData] = useState(false)
+  const [isCloudSynced, setIsCloudSynced] = useState(false)
+
   // Load initially from localStorage with safe fallback to demo data
   const [initialStorageState] = useState(() => loadTransactionsFromStorage())
   const [transactions, setTransactions] = useState<Transaction[]>(initialStorageState.transactions)
@@ -71,6 +77,51 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     loadSavingsReviews()
   )
 
+  const wasAuthenticatedRef = useRef(false)
+
+  // Synchronize with backend when user is authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      if (wasAuthenticatedRef.current) {
+        // Revert to local storage state only when logging out from authenticated state
+        const local = loadTransactionsFromStorage()
+        setTransactions(local.transactions)
+        setRecurringReviews(loadRecurringReviews())
+        setAnomalyReviews(loadAnomalyReviews())
+        setSavingsReviews(loadSavingsReviews())
+        setIsCloudSynced(false)
+        wasAuthenticatedRef.current = false
+      }
+      return
+    }
+
+    wasAuthenticatedRef.current = true
+    let isMounted = true
+    queueMicrotask(() => {
+      if (isMounted) setIsLoadingCloudData(true)
+    })
+
+    Promise.all([
+      api.transactions.list().catch(() => ({ transactions: [] })),
+      api.reviews.getReviews().catch(() => ({ recurringReviews: {}, anomalyReviews: {}, savingsReviews: {} })),
+    ])
+      .then(([txData, reviewData]) => {
+        if (!isMounted) return
+        setTransactions(txData.transactions || [])
+        setRecurringReviews(reviewData.recurringReviews || {})
+        setAnomalyReviews(reviewData.anomalyReviews || {})
+        setSavingsReviews(reviewData.savingsReviews || {})
+        setIsCloudSynced(true)
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingCloudData(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [isAuthenticated, user])
+
   // 1. CREATE Transaction
   const addTransaction = useCallback((newTx: Omit<Transaction, 'id'>): Transaction => {
     const created: Transaction = {
@@ -79,11 +130,20 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     setTransactions((prev) => {
       const next = [created, ...prev]
-      saveTransactionsToStorage(next)
+      if (!isAuthenticated) {
+        saveTransactionsToStorage(next)
+      }
       return next
     })
+
+    if (isAuthenticated) {
+      api.transactions.create(created).catch((err) => {
+        console.error('[Finora API] Failed to create transaction on server:', err)
+      })
+    }
+
     return created
-  }, [])
+  }, [isAuthenticated])
 
   // 2. EDIT Transaction
   const editTransaction = useCallback((id: string, updated: Omit<Transaction, 'id'>): boolean => {
@@ -97,12 +157,21 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         ...updated,
         id, // Preserve original stable ID
       }
-      saveTransactionsToStorage(next)
+      if (!isAuthenticated) {
+        saveTransactionsToStorage(next)
+      }
       success = true
       return next
     })
+
+    if (isAuthenticated) {
+      api.transactions.update(id, updated).catch((err) => {
+        console.error('[Finora API] Failed to update transaction on server:', err)
+      })
+    }
+
     return success
-  }, [])
+  }, [isAuthenticated])
 
   // 3. DELETE Transaction
   const deleteTransaction = useCallback((id: string): Transaction | null => {
@@ -113,11 +182,20 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       deleted = item
 
       const next = prev.filter((t) => t.id !== id)
-      saveTransactionsToStorage(next)
+      if (!isAuthenticated) {
+        saveTransactionsToStorage(next)
+      }
       return next
     })
+
+    if (isAuthenticated) {
+      api.transactions.delete(id).catch((err) => {
+        console.error('[Finora API] Failed to delete transaction on server:', err)
+      })
+    }
+
     return deleted
-  }, [])
+  }, [isAuthenticated])
 
   // 4. UNDO DELETE
   const undoDelete = useCallback((restoredTx: Transaction) => {
@@ -125,10 +203,18 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Avoid inserting duplicate if already present
       if (prev.some((t) => t.id === restoredTx.id)) return prev
       const next = [restoredTx, ...prev]
-      saveTransactionsToStorage(next)
+      if (!isAuthenticated) {
+        saveTransactionsToStorage(next)
+      }
       return next
     })
-  }, [])
+
+    if (isAuthenticated) {
+      api.transactions.create(restoredTx).catch((err) => {
+        console.error('[Finora API] Failed to restore transaction on server:', err)
+      })
+    }
+  }, [isAuthenticated])
 
   // 5. BATCH IMPORT Transactions
   const importTransactions = useCallback((newTxs: Omit<Transaction, 'id'>[]): { importedCount: number } => {
@@ -141,12 +227,20 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     setTransactions((prev) => {
       const next = [...createdList, ...prev]
-      saveTransactionsToStorage(next)
+      if (!isAuthenticated) {
+        saveTransactionsToStorage(next)
+      }
       return next
     })
 
+    if (isAuthenticated) {
+      api.transactions.batchCreate(createdList).catch((err) => {
+        console.error('[Finora API] Failed to batch create transactions on server:', err)
+      })
+    }
+
     return { importedCount: createdList.length }
-  }, [])
+  }, [isAuthenticated])
 
   // 6. RECURRING CANDIDATE REVIEWS
   const confirmRecurringCandidate = useCallback((candidateKey: string) => {
@@ -155,9 +249,13 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       status: 'confirmed',
       reviewedAt: new Date().toISOString(),
     }
-    saveRecurringReview(record)
+    if (!isAuthenticated) {
+      saveRecurringReview(record)
+    } else {
+      api.reviews.saveRecurring(record).catch(console.error)
+    }
     setRecurringReviews((prev) => ({ ...prev, [candidateKey]: record }))
-  }, [])
+  }, [isAuthenticated])
 
   const dismissRecurringCandidate = useCallback((candidateKey: string) => {
     const record: RecurringReviewRecord = {
@@ -165,23 +263,35 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       status: 'dismissed',
       reviewedAt: new Date().toISOString(),
     }
-    saveRecurringReview(record)
+    if (!isAuthenticated) {
+      saveRecurringReview(record)
+    } else {
+      api.reviews.saveRecurring(record).catch(console.error)
+    }
     setRecurringReviews((prev) => ({ ...prev, [candidateKey]: record }))
-  }, [])
+  }, [isAuthenticated])
 
   const reinstateRecurringCandidate = useCallback((candidateKey: string) => {
-    removeRecurringReview(candidateKey)
+    if (!isAuthenticated) {
+      removeRecurringReview(candidateKey)
+    } else {
+      api.reviews.removeRecurring(candidateKey).catch(console.error)
+    }
     setRecurringReviews((prev) => {
       const next = { ...prev }
       delete next[candidateKey]
       return next
     })
-  }, [])
+  }, [isAuthenticated])
 
   const resetRecurringReviews = useCallback(() => {
-    clearRecurringReviews()
+    if (!isAuthenticated) {
+      clearRecurringReviews()
+    } else {
+      api.reviews.resetRecurring().catch(console.error)
+    }
     setRecurringReviews({})
-  }, [])
+  }, [isAuthenticated])
 
   // 7. SPENDING ANOMALY REVIEWS
   const reviewAnomalyFinding = useCallback((findingKey: string) => {
@@ -191,9 +301,13 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       status: 'reviewed',
       reviewedAt: new Date().toISOString(),
     }
-    saveAnomalyReview(record)
+    if (!isAuthenticated) {
+      saveAnomalyReview(record)
+    } else {
+      api.reviews.saveAnomaly(record).catch(console.error)
+    }
     setAnomalyReviews((prev) => ({ ...prev, [findingKey]: record }))
-  }, [])
+  }, [isAuthenticated])
 
   const dismissAnomalyFinding = useCallback((findingKey: string) => {
     const record: AnomalyReviewRecord = {
@@ -202,23 +316,35 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       status: 'dismissed',
       reviewedAt: new Date().toISOString(),
     }
-    saveAnomalyReview(record)
+    if (!isAuthenticated) {
+      saveAnomalyReview(record)
+    } else {
+      api.reviews.saveAnomaly(record).catch(console.error)
+    }
     setAnomalyReviews((prev) => ({ ...prev, [findingKey]: record }))
-  }, [])
+  }, [isAuthenticated])
 
   const reinstateAnomalyFinding = useCallback((findingKey: string) => {
-    removeAnomalyReview(findingKey)
+    if (!isAuthenticated) {
+      removeAnomalyReview(findingKey)
+    } else {
+      api.reviews.removeAnomaly(findingKey).catch(console.error)
+    }
     setAnomalyReviews((prev) => {
       const next = { ...prev }
       delete next[findingKey]
       return next
     })
-  }, [])
+  }, [isAuthenticated])
 
   const resetAnomalyReviews = useCallback(() => {
-    clearAnomalyReviews()
+    if (!isAuthenticated) {
+      clearAnomalyReviews()
+    } else {
+      api.reviews.resetAnomaly().catch(console.error)
+    }
     setAnomalyReviews({})
-  }, [])
+  }, [isAuthenticated])
 
   // 8. SAVINGS OPPORTUNITY REVIEWS
   const saveSavingsOpportunity = useCallback((opportunityKey: string) => {
@@ -227,9 +353,13 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       status: 'saved',
       reviewedAt: new Date().toISOString(),
     }
-    saveSavingsReview(record)
+    if (!isAuthenticated) {
+      saveSavingsReview(record)
+    } else {
+      api.reviews.saveSavings(record).catch(console.error)
+    }
     setSavingsReviews((prev) => ({ ...prev, [opportunityKey]: record }))
-  }, [])
+  }, [isAuthenticated])
 
   const planSavingsOpportunity = useCallback(
     (opportunityKey: string, customTarget?: number) => {
@@ -239,10 +369,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         reviewedAt: new Date().toISOString(),
         customTargetPercent: customTarget,
       }
-      saveSavingsReview(record)
+      if (!isAuthenticated) {
+        saveSavingsReview(record)
+      } else {
+        api.reviews.saveSavings(record).catch(console.error)
+      }
       setSavingsReviews((prev) => ({ ...prev, [opportunityKey]: record }))
     },
-    []
+    [isAuthenticated]
   )
 
   const completeSavingsOpportunity = useCallback((opportunityKey: string) => {
@@ -251,9 +385,13 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       status: 'completed',
       reviewedAt: new Date().toISOString(),
     }
-    saveSavingsReview(record)
+    if (!isAuthenticated) {
+      saveSavingsReview(record)
+    } else {
+      api.reviews.saveSavings(record).catch(console.error)
+    }
     setSavingsReviews((prev) => ({ ...prev, [opportunityKey]: record }))
-  }, [])
+  }, [isAuthenticated])
 
   const dismissSavingsOpportunity = useCallback((opportunityKey: string) => {
     const record: SavingsReviewRecord = {
@@ -261,36 +399,68 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       status: 'dismissed',
       reviewedAt: new Date().toISOString(),
     }
-    saveSavingsReview(record)
+    if (!isAuthenticated) {
+      saveSavingsReview(record)
+    } else {
+      api.reviews.saveSavings(record).catch(console.error)
+    }
     setSavingsReviews((prev) => ({ ...prev, [opportunityKey]: record }))
-  }, [])
+  }, [isAuthenticated])
 
   const reinstateSavingsOpportunity = useCallback((opportunityKey: string) => {
-    removeSavingsReview(opportunityKey)
+    if (!isAuthenticated) {
+      removeSavingsReview(opportunityKey)
+    } else {
+      api.reviews.removeSavings(opportunityKey).catch(console.error)
+    }
     setSavingsReviews((prev) => {
       const next = { ...prev }
       delete next[opportunityKey]
       return next
     })
-  }, [])
+  }, [isAuthenticated])
 
   const resetSavingsReviews = useCallback(() => {
-    clearSavingsReviews()
+    if (!isAuthenticated) {
+      clearSavingsReviews()
+    } else {
+      api.reviews.resetSavings().catch(console.error)
+    }
     setSavingsReviews({})
-  }, [])
+  }, [isAuthenticated])
+
+  // Explicit user action to copy sample demo transactions into personal account
+  const seedDemoDataToAccount = useCallback(async () => {
+    const fresh = getFreshDemoTransactions()
+    if (isAuthenticated) {
+      try {
+        await api.transactions.batchCreate(fresh)
+      } catch (err) {
+        console.error('[Finora API] Failed to seed demo records:', err)
+      }
+    }
+    setTransactions(fresh)
+  }, [isAuthenticated])
 
   // 9. RESET to Demo Dataset
   const resetToDemo = useCallback(() => {
     const fresh = getFreshDemoTransactions()
     setTransactions(fresh)
-    saveTransactionsToStorage(fresh)
-    clearRecurringReviews()
+    if (!isAuthenticated) {
+      saveTransactionsToStorage(fresh)
+      clearRecurringReviews()
+      clearAnomalyReviews()
+      clearSavingsReviews()
+    } else {
+      api.transactions.clearAll().then(() => api.transactions.batchCreate(fresh)).catch(console.error)
+      api.reviews.resetRecurring().catch(console.error)
+      api.reviews.resetAnomaly().catch(console.error)
+      api.reviews.resetSavings().catch(console.error)
+    }
     setRecurringReviews({})
-    clearAnomalyReviews()
     setAnomalyReviews({})
-    clearSavingsReviews()
     setSavingsReviews({})
-  }, [])
+  }, [isAuthenticated])
 
   // Modal helpers
   const openAddTxModal = useCallback(() => {
@@ -399,6 +569,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     openImportModal: () => setIsImportModalOpen(true),
     closeImportModal: () => setIsImportModalOpen(false),
     isUsingFallback: initialStorageState.isUsingFallback,
+    isCloudSynced,
+    isLoadingCloudData,
+    seedDemoDataToAccount,
   }
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>
