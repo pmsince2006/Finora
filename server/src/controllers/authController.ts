@@ -8,23 +8,32 @@ import type { AuthenticatedRequest } from '../middleware/auth.js'
 function getCookieOptions(): {
   httpOnly: boolean
   secure: boolean
-  sameSite: 'none' | 'lax'
+  sameSite: 'lax' | 'none' | 'strict'
   path: string
   domain?: string
 } {
   const isProd = env.NODE_ENV === 'production'
   const cookieDomain = process.env.COOKIE_DOMAIN?.trim()
+  const sameSiteEnv = process.env.COOKIE_SAMESITE?.toLowerCase()
+
+  // For Topology B (Vercel reverse proxy) same-origin API requests, 'lax' is the standard secure policy.
+  const sameSite: 'lax' | 'none' | 'strict' =
+    sameSiteEnv === 'none'
+      ? 'none'
+      : sameSiteEnv === 'strict'
+        ? 'strict'
+        : 'lax'
 
   const options: {
     httpOnly: boolean
     secure: boolean
-    sameSite: 'none' | 'lax'
+    sameSite: 'lax' | 'none' | 'strict'
     path: string
     domain?: string
   } = {
     httpOnly: true,
     secure: isProd,
-    sameSite: cookieDomain ? 'lax' : isProd ? 'none' : 'lax',
+    sameSite,
     path: '/',
   }
 

@@ -42,8 +42,8 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
       email: decoded.email,
     }
     next()
-  } catch (err) {
-    if (err instanceof jwt.TokenExpiredError) {
+  } catch (err: any) {
+    if (err?.name === 'TokenExpiredError' || err instanceof jwt.TokenExpiredError) {
       res.status(401).json({
         error: 'Session expired. Please log in again.',
         code: 'TOKEN_EXPIRED',

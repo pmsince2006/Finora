@@ -9,6 +9,9 @@ import { errorHandler } from './middleware/errorHandler.js'
 
 export const app = express()
 
+// Trust first proxy hop (Render edge / Vercel reverse proxy)
+app.set('trust proxy', 1)
+
 // CORS configuration - strict origin with credentials support
 const normalizedAllowedOrigin = env.FRONTEND_ORIGIN.replace(/\/+$/, '')
 

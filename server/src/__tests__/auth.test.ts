@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import request from 'supertest'
+import jwt from 'jsonwebtoken'
 import { app } from '../app.js'
+import { env } from '../config/env.js'
 import './setup.js'
 
 describe('Backend Auth API (/api/auth)', () => {
@@ -27,6 +29,7 @@ describe('Backend Auth API (/api/auth)', () => {
     const sessionCookie = (cookies as string[]).find((c) => c.startsWith('finora_session='))
     expect(sessionCookie).toBeDefined()
     expect(sessionCookie).toContain('HttpOnly')
+    expect(sessionCookie).toMatch(/SameSite=Lax/i)
   })
 
   it('prevents duplicate email registration safely with 409', async () => {
@@ -117,6 +120,21 @@ describe('Backend Auth API (/api/auth)', () => {
       .get('/api/auth/me')
       .set('Cookie', ['finora_session=invalid.token.here'])
     expect(fakeCookie.status).toBe(401)
+  })
+
+  it('rejects /api/auth/me when session token is expired', async () => {
+    const expiredToken = jwt.sign(
+      { userId: '507f1f77bcf86cd799439011', email: 'expired@example.com' },
+      env.JWT_SECRET,
+      { expiresIn: '-1s' }
+    )
+
+    const res = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', [`finora_session=${expiredToken}`])
+
+    expect(res.status).toBe(401)
+    expect(res.body.code).toBe('TOKEN_EXPIRED')
   })
 
   it('clears session cookie on logout', async () => {

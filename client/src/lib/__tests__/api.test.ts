@@ -145,4 +145,49 @@ describe('Client API Service (client/src/lib/api.ts)', () => {
     // Token rehydrated into memory
     expect(getMemoryToken()).toBe('jwt.restored.token')
   })
+
+  it('never writes authentication tokens to localStorage or sessionStorage', async () => {
+    const mockStorage: Record<string, string> = {}
+    const originalLocalStorage = (globalThis as any).localStorage
+    ;(globalThis as any).localStorage = {
+      setItem: vi.fn((key: string, val: string) => {
+        mockStorage[key] = val
+      }),
+      getItem: vi.fn((key: string) => mockStorage[key] || null),
+    }
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ user: { id: 'u-1', email: 'test@finora.in', fullName: 'Test' }, token: 'secret.jwt.token' }),
+    } as Response)
+
+    try {
+      await api.auth.login('test@finora.in', 'password123')
+
+      // Confirm that setItem was never called with any token
+      expect((globalThis as any).localStorage.setItem).not.toHaveBeenCalled()
+      expect(mockStorage['token']).toBeUndefined()
+    } finally {
+      ;(globalThis as any).localStorage = originalLocalStorage
+    }
+  })
+
+  it('uses same-origin /api path and preserves query parameters without baseUrl prefix', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ transaction: { id: 'tx-100', description: 'Groceries', amount: 500 } }),
+    } as Response)
+
+    await api.transactions.update('tx-100', { description: 'Updated Groceries' } as any)
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/api/transactions/tx-100',
+      expect.objectContaining({
+        method: 'PUT',
+        credentials: 'include',
+      })
+    )
+  })
 })
