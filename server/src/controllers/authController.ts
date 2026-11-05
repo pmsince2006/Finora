@@ -119,7 +119,6 @@ export async function register(req: Request, res: Response, next: NextFunction):
 
     res.status(201).json({
       user: newUser.toJSON(),
-      token, // Also return token in JSON for clients preferring Authorization header
       message: 'Account registered successfully.',
     })
   } catch (error: any) {
@@ -162,7 +161,6 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 
     res.status(200).json({
       user: user.toJSON(),
-      token,
       message: 'Signed in successfully.',
     })
   } catch (error) {
@@ -191,10 +189,8 @@ export async function getMe(req: AuthenticatedRequest, res: Response, next: Next
       return
     }
 
-    const token = generateToken(user)
     res.status(200).json({
       user: user.toJSON(),
-      token,
     })
   } catch (error) {
     next(error)

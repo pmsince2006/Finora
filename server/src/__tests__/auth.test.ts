@@ -12,7 +12,7 @@ describe('Backend Auth API (/api/auth)', () => {
     password: 'Password123!',
   }
 
-  it('registers a new user, hashes password, and sets session cookie', async () => {
+  it('registers a new user, hashes password, sets session cookie, and does not return token in JSON', async () => {
     const res = await request(app)
       .post('/api/auth/register')
       .send(validUser)
@@ -22,6 +22,7 @@ describe('Backend Auth API (/api/auth)', () => {
     expect(res.body.user.email).toBe('rohan.sharma@example.com') // Normalized to lowercase
     expect(res.body.user.fullName).toBe('Rohan Sharma')
     expect(res.body.user.password).toBeUndefined() // Password hash never exposed
+    expect(res.body.token).toBeUndefined() // Token omitted from response body
 
     // Check Set-Cookie header contains finora_session HttpOnly cookie
     const cookies = res.headers['set-cookie']
@@ -61,7 +62,7 @@ describe('Backend Auth API (/api/auth)', () => {
     expect(shortPassword.status).toBe(400)
   })
 
-  it('authenticates existing user and rejects incorrect credentials', async () => {
+  it('authenticates existing user, sets cookie, and does not return token in JSON', async () => {
     await request(app).post('/api/auth/register').send(validUser)
 
     // Incorrect password
@@ -83,9 +84,16 @@ describe('Backend Auth API (/api/auth)', () => {
       .send({ email: 'rohan.sharma@example.com', password: validUser.password })
     expect(success.status).toBe(200)
     expect(success.body.user.email).toBe('rohan.sharma@example.com')
+    expect(success.body.token).toBeUndefined()
+
+    const cookies = success.headers['set-cookie'] as string[]
+    expect(cookies).toBeDefined()
+    const sessionCookie = cookies.find((c) => c.startsWith('finora_session='))
+    expect(sessionCookie).toBeDefined()
+    expect(sessionCookie).toContain('HttpOnly')
   })
 
-  it('restores user session via /api/auth/me using HttpOnly cookie', async () => {
+  it('restores user session via /api/auth/me using HttpOnly cookie without returning a token', async () => {
     const regRes = await request(app).post('/api/auth/register').send(validUser)
     const cookies = regRes.headers['set-cookie'] as string[]
 
@@ -95,13 +103,13 @@ describe('Backend Auth API (/api/auth)', () => {
 
     expect(meRes.status).toBe(200)
     expect(meRes.body.user.email).toBe('rohan.sharma@example.com')
-    expect(meRes.body.token).toBeDefined()
+    expect(meRes.body.token).toBeUndefined()
   })
 
   it('authenticates via Authorization: Bearer header when cookie is absent', async () => {
     const regRes = await request(app).post('/api/auth/register').send(validUser)
-    const token = regRes.body.token
-    expect(token).toBeDefined()
+    const userId = regRes.body.user.id
+    const token = jwt.sign({ userId, email: 'rohan.sharma@example.com' }, env.JWT_SECRET, { expiresIn: '1h' })
 
     // Request WITHOUT any Cookie header, only Authorization: Bearer
     const meRes = await request(app)
@@ -110,6 +118,7 @@ describe('Backend Auth API (/api/auth)', () => {
 
     expect(meRes.status).toBe(200)
     expect(meRes.body.user.email).toBe('rohan.sharma@example.com')
+    expect(meRes.body.token).toBeUndefined()
   })
 
   it('rejects /api/auth/me when session cookie is absent or invalid', async () => {

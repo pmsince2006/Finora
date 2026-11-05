@@ -6,7 +6,7 @@ describe('Client API Service (client/src/lib/api.ts)', () => {
     vi.restoreAllMocks()
   })
 
-  it('sends credentials: "include" and handles JSON response', async () => {
+  it('sends credentials: "include" and handles JSON response on api.auth.getMe()', async () => {
     const mockUser = { id: 'u-123', email: 'test@finora.internal', fullName: 'Test Finora' }
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
@@ -25,7 +25,7 @@ describe('Client API Service (client/src/lib/api.ts)', () => {
     )
   })
 
-  it('throws structured ApiError when server returns error response', async () => {
+  it('throws structured ApiError when server returns error response on login', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: false,
       status: 401,
@@ -36,7 +36,7 @@ describe('Client API Service (client/src/lib/api.ts)', () => {
     await expect(api.auth.login('bad@example.com', 'wrongpassword')).rejects.toThrow(ApiError)
   })
 
-  it('extracts error message from ApiError correctly', async () => {
+  it('extracts error message from ApiError correctly on registration failure', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: false,
       status: 409,
@@ -55,95 +55,94 @@ describe('Client API Service (client/src/lib/api.ts)', () => {
     }
   })
 
-  it('attaches in-memory Bearer token fallback without touching localStorage', async () => {
+  it('executes registration and login using cookie-based transport with credentials: "include"', async () => {
+    const mockUser = { id: 'u-1', email: 'user@finora.in', fullName: 'Test User' }
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => ({ user: mockUser, message: 'Account registered successfully.' }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => ({ user: mockUser, message: 'Signed in successfully.' }),
+      } as Response)
+
+    const regRes = await api.auth.register('Test User', 'user@finora.in', 'Password123!')
+    expect(regRes.user.email).toBe('user@finora.in')
+    expect(fetchSpy).toHaveBeenNthCalledWith(
+      1,
+      '/api/auth/register',
+      expect.objectContaining({ credentials: 'include', method: 'POST' })
+    )
+
+    const loginRes = await api.auth.login('user@finora.in', 'Password123!')
+    expect(loginRes.user.email).toBe('user@finora.in')
+    expect(fetchSpy).toHaveBeenNthCalledWith(
+      2,
+      '/api/auth/login',
+      expect.objectContaining({ credentials: 'include', method: 'POST' })
+    )
+  })
+
+  it('restores user session across page refresh via cookie-based api.auth.getMe()', async () => {
+    const mockUser = { id: 'u-1', email: 'user@finora.in', fullName: 'Refreshed User' }
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => ({ user: { id: 'u-1', email: 'a@b.com', fullName: 'A' }, token: 'jwt.sample.token' }),
-    } as Response)
-
-    // Login stores in-memory token
-    await api.auth.login('a@b.com', 'password123')
-
-    // Next request includes Authorization: Bearer header
-    fetchSpy.mockResolvedValueOnce({
-      ok: true,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => ({ transactions: [] }),
-    } as Response)
-
-    await api.transactions.list()
-    expect(fetchSpy).toHaveBeenLastCalledWith(
-      '/api/transactions',
-      expect.objectContaining({
-        headers: expect.any(Headers),
-      })
-    )
-    const calledHeaders = fetchSpy.mock.calls[1][1]?.headers as Headers
-    expect(calledHeaders.get('Authorization')).toBe('Bearer jwt.sample.token')
-
-    // Logout clears token
-    fetchSpy.mockResolvedValueOnce({
-      ok: true,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => ({ success: true }),
-    } as Response)
-    await api.auth.logout()
-
-    fetchSpy.mockResolvedValueOnce({
-      ok: true,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => ({ user: { id: 'u-1' } }),
-    } as Response)
-    await api.auth.getMe()
-    const finalHeaders = fetchSpy.mock.calls[3][1]?.headers as Headers
-    expect(finalHeaders.get('Authorization')).toBeNull()
-  })
-
-  it('demonstrates refresh failure when third-party cookies are blocked and memory is wiped', async () => {
-    // 1. User logs in, backend returns user and token
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
-      ok: true,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => ({ user: { id: 'u-1', email: 'user@finora.in', fullName: 'User' }, token: 'jwt.active.token' }),
-    } as Response)
-    await api.auth.login('user@finora.in', 'password123')
-
-    // 2. Simulated Page Refresh: JavaScript execution context resets and RAM is cleared
-    // In a real browser reload, module-level memoryToken reverts to null
-    const { setMemoryToken } = await import('../api')
-    setMemoryToken(null)
-
-    // 3. Browser has blocked cross-site cookies, so fetch sends no cookie; server rejects with 401
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
-      ok: false,
-      status: 401,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => ({ error: 'Authentication required. No session token provided.', code: 'AUTH_REQUIRED' }),
-    } as Response)
-
-    // 4. Verification: getMe fails, triggering logout in AuthContext
-    await expect(api.auth.getMe()).rejects.toThrow(ApiError)
-  })
-
-  it('demonstrates successful session restore across refresh when cookies are supported (custom domain / proxy)', async () => {
-    // 1. Simulated Page Refresh with clean memory
-    const { setMemoryToken, getMemoryToken } = await import('../api')
-    setMemoryToken(null)
-    expect(getMemoryToken()).toBeNull()
-
-    // 2. Browser includes 1st-party / same-site cookie with credentials: 'include'
-    // Server validates cookie and returns authenticated user and fresh token
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
-      ok: true,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => ({ user: { id: 'u-1', email: 'user@finora.in', fullName: 'User' }, token: 'jwt.restored.token' }),
+      json: async () => ({ user: mockUser }),
     } as Response)
 
     const res = await api.auth.getMe()
-    expect(res.user.email).toBe('user@finora.in')
-    // Token rehydrated into memory
-    expect(getMemoryToken()).toBe('jwt.restored.token')
+    expect(res.user.fullName).toBe('Refreshed User')
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/api/auth/me',
+      expect.objectContaining({
+        credentials: 'include',
+        method: 'GET',
+      })
+    )
+  })
+
+  it('clears session on logout via api.auth.logout() with credentials: "include"', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ success: true, message: 'Signed out successfully.' }),
+    } as Response)
+
+    const res = await api.auth.logout()
+    expect(res.success).toBe(true)
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/api/auth/logout',
+      expect.objectContaining({
+        credentials: 'include',
+        method: 'POST',
+      })
+    )
+  })
+
+  it('rejects with ApiError when session cookie is absent, expired, or invalid', async () => {
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => ({ error: 'Authentication required. No session token provided.', code: 'AUTH_REQUIRED' }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => ({ error: 'Session expired. Please log in again.', code: 'TOKEN_EXPIRED' }),
+      } as Response)
+
+    // Unauthenticated
+    await expect(api.auth.getMe()).rejects.toThrow(ApiError)
+
+    // Expired cookie
+    await expect(api.auth.getMe()).rejects.toThrow(ApiError)
   })
 
   it('never writes authentication tokens to localStorage or sessionStorage', async () => {
@@ -159,15 +158,16 @@ describe('Client API Service (client/src/lib/api.ts)', () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => ({ user: { id: 'u-1', email: 'test@finora.in', fullName: 'Test' }, token: 'secret.jwt.token' }),
+      json: async () => ({ user: { id: 'u-1', email: 'test@finora.in', fullName: 'Test' } }),
     } as Response)
 
     try {
       await api.auth.login('test@finora.in', 'password123')
 
-      // Confirm that setItem was never called with any token
+      // Confirm that setItem was never called
       expect((globalThis as any).localStorage.setItem).not.toHaveBeenCalled()
       expect(mockStorage['token']).toBeUndefined()
+      expect(mockStorage['finora_session']).toBeUndefined()
     } finally {
       ;(globalThis as any).localStorage = originalLocalStorage
     }
