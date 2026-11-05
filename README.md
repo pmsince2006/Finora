@@ -1,181 +1,244 @@
-# Finora — Personal Finance Intelligence Platform
+# Finora
 
-> **"Your money. Under investigation."**  
-> Finora is an analytical personal finance intelligence platform for students, interns, and early-career professionals in India.
+### Your money. Under investigation.
+
+**Finora** is a personal finance tracking and analysis platform designed to help individuals understand their spending habits, monitor recurring payments, identify unusual expenses, and discover potential savings opportunities.
+
+Rather than simply displaying transaction records, Finora turns financial activity into meaningful insights through an intuitive dashboard and a collection of analytical tools.
+
+**Live Application:** [https://finoratrack.vercel.app/](https://finoratrack.vercel.app/)
 
 ---
 
-## 1. Architecture Overview
+## Overview
 
-Finora uses an npm workspaces monorepo structure consisting of a client application and an Express/MongoDB backend service:
+Managing personal finances involves more than recording income and expenses. Understanding where money goes, identifying recurring commitments, and recognizing unusual spending patterns are equally important.
+
+Finora brings these activities together in one platform.
+
+Users can maintain a transaction ledger, analyze spending patterns, review recurring payments, investigate spending anomalies, and explore potential savings opportunities.
+
+The platform supports both demo mode and authenticated accounts, allowing users to explore the application while also providing persistent, user-specific financial records.
+
+## Features
+
+### 1. Money Ledger
+
+A centralized interface for managing financial transactions.
+
+- Record, edit, and delete income and expense entries.
+- Import transactions through CSV files.
+- Map CSV columns to the application's transaction fields.
+- Detect duplicate imported transactions.
+- Filter, sort, and paginate transaction records.
+- Undo supported transaction actions.
+
+### 2. Recurring Payment Detective
+
+Identify recurring financial commitments from transaction history.
+
+- Detect potentially recurring payments.
+- Analyze transaction frequency and cadence.
+- Review recurring payment patterns.
+- Maintain review states for identified recurring charges.
+
+### 3. Spending Anomaly Radar
+
+Identify unusual spending activity by comparing transactions against historical patterns.
+
+- Establish historical spending baselines.
+- Use median and Median Absolute Deviation (MAD) to identify unusual values.
+- Account for partial periods when comparing spending.
+- Review and exclude identified anomalies where appropriate.
+
+### 4. Savings Opportunity Lab
+
+Explore potential ways to reduce discretionary spending.
+
+- Evaluate eligible discretionary spending categories.
+- Use a configurable 10% savings target for eligible categories.
+- Identify potential savings opportunities.
+- Separate planned savings from estimated potential savings.
+- Provide merchant concentration insights.
+
+Savings figures are estimates based on recorded transactions and application assumptions. They should not be interpreted as realized savings.
+
+### 5. Financial Overview
+
+A centralized dashboard that brings important financial information together.
+
+- Review financial activity.
+- Understand income and expenses.
+- Access key financial analysis modules.
+- Navigate between the platform's major features.
+
+### 6. Authentication and Data Persistence
+
+Finora supports both demo and authenticated experiences.
+
+- User registration and login.
+- Secure, HTTP-only authentication cookies.
+- User-specific financial records stored in MongoDB.
+- Persistent review states for supported analytical modules.
+- Browser-based local storage for demo-mode data.
+
+---
+
+## Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, TypeScript, Vite |
+| Styling | Tailwind CSS v4 |
+| Routing | React Router |
+| Animations | Framer Motion |
+| Data Visualization | Recharts |
+| Visual Effects | OGL |
+| Backend | Node.js, Express.js, TypeScript |
+| Database | MongoDB Atlas |
+| ODM | Mongoose |
+| Authentication | JWT, HTTP-only cookies |
+| Testing | Vitest |
+| Frontend Hosting | Vercel |
+| Backend Hosting | Render |
+| Version Control | Git and GitHub |
+
+---
+
+## Architecture
+
+Finora follows a frontend-backend architecture with MongoDB as its persistent database.
 
 ```text
-finora/
-├── client/                     # Frontend Application (React 19 + TypeScript + Vite 8)
-│   ├── src/
-│   │   ├── components/         # Design system & forensic UI components
-│   │   ├── context/            # AuthContext, FinanceContext, ToastContext
-│   │   ├── lib/                # Pure analytical engines (Recurring, Anomaly, Savings) & API client
-│   │   ├── pages/              # Route views (Overview, Ledger, Recurring, Anomaly, Savings, Settings)
-│   │   └── types/              # Canonical finance schemas (Transaction, Anomaly, Candidate, Savings)
-│   └── vite.config.ts          # Dev proxy mapping /api -> http://localhost:5000
-│
-├── server/                     # Backend Service (Node.js + Express + Mongoose)
-│   ├── src/
-│   │   ├── config/             # Environment validation (env.ts) and MongoDB connection (db.ts)
-│   │   ├── controllers/        # Auth, Transaction, and Review state controllers
-│   │   ├── middleware/         # Auth verification (JWT in HttpOnly cookie), rate limiting, errorHandler
-│   │   ├── models/             # Mongoose schemas (User, Transaction, ReviewState)
-│   │   ├── routes/             # Express routers (/api/auth, /api/transactions, /api/reviews)
-│   │   ├── __tests__/          # Automated Vitest integration test suite
-│   │   ├── app.ts              # Express application setup, CORS, parsers
-│   │   └── server.ts           # Server bootstrap and graceful shutdown
-│   ├── .env.example            # Environment configuration template
-│   └── package.json            # Server dependencies and scripts
-│
-├── docs/                       # Project documentation & roadmap status
-├── package.json                # Root npm workspace configuration
-└── package-lock.json           # Canonical root lockfile
+                 User
+                  |
+                  v
+          Finora Web Application
+              (React + Vite)
+                  |
+                  v
+              Vercel
+          Frontend Hosting
+                  |
+                  v
+            /api/* Requests
+                  |
+                  v
+           Vercel Reverse Proxy
+                  |
+                  v
+           Express.js Backend
+               (Render)
+                  |
+          +-------+-------+
+          |               |
+          v               v
+    Authentication    Application
+       Cookies          Logic
+          |               |
+          +-------+-------+
+                  |
+                  v
+             Mongoose
+                  |
+                  v
+             MongoDB Atlas
 ```
 
----
+### Deployment Architecture
 
-## 2. Prerequisites
+- **Frontend:** Deployed on Vercel.
+- **Backend:** Deployed on Render.
+- **Database:** Hosted on MongoDB Atlas.
+- **API communication:** Frontend API requests are routed through a Vercel reverse proxy to the Render backend.
+- **Authentication:** HTTP-only cookies are used for authenticated browser sessions.
 
-- **Node.js**: `v20.0.0` or higher (verified on Node.js `v24.13.0`)
-- **npm**: `v10.0.0` or higher (verified on npm `11.6.2`)
-- **MongoDB**: Local MongoDB instance running on `mongodb://127.0.0.1:27017` (e.g., MongoDB Community Server v7+ or v8+)
-
----
-
-## 3. Environment Configuration
-
-The backend requires configuration variables for port, MongoDB connection, JWT signing secret, and allowed CORS origins.
-
-### Setting up the Server Environment
-Create `server/.env` based on `server/.env.example`:
-
-```bash
-# Server port
-PORT=5000
-
-# Environment mode
-NODE_ENV=development
-
-# MongoDB Connection String (Local default)
-MONGODB_URI=mongodb://127.0.0.1:27017/finora
-
-# JWT Secret Key (Use a minimum 16-character secret for signing session cookies)
-JWT_SECRET=finora_local_development_secret_key_change_me_32chars
-
-# Allowed Frontend Origin for CORS
-FRONTEND_ORIGIN=http://localhost:5173
-```
-
-> [!NOTE]
-> `.env` files are ignored by `.gitignore` to prevent credential leaks.
+The reverse proxy allows the frontend to communicate with the backend through its own origin, helping avoid common cross-origin cookie restrictions.
 
 ---
 
-## 4. Installation & Local Execution
+## Security Considerations
 
-### Install All Dependencies
-From the repository root:
-```bash
-npm install
-```
+Finora incorporates several security practices:
 
-### Start Local Development Servers
-In separate terminal windows:
+- Password-based authentication.
+- JWT-based session authentication.
+- HTTP-only cookies to prevent direct JavaScript access to authentication tokens.
+- Secure cookie settings in production.
+- User-specific data access.
+- Restricted backend CORS configuration.
+- Environment variables for sensitive configuration.
+- No authentication tokens stored in browser local storage or session storage.
 
-**Terminal 1 (Backend Server):**
-```bash
-# Runs server with auto-reload at http://localhost:5000
-npm run dev:server
-```
-
-**Terminal 2 (Frontend Client):**
-```bash
-# Runs Vite dev server at http://localhost:5173
-npm run dev
-```
-
-The frontend Vite server automatically proxies `/api` calls to `http://localhost:5000`.
+Users should never commit database credentials, authentication secrets, or production environment files to version control.
 
 ---
 
-## 5. Verification Commands
+## Demo Mode and Authenticated Mode
 
-Run all checks from the root directory:
+Finora supports two ways to explore the application.
 
-| Task | Command | Description |
-| :--- | :--- | :--- |
-| **Full Test Suite** | `npm test` | Runs both client (76 tests) and server (17 tests) Vitest suites |
-| **Client Tests** | `npm run test:client` | Runs client regression, math, and API tests |
-| **Server Tests** | `npm run test:server` | Runs backend auth, transactions, and user isolation tests |
-| **Linting** | `npm run lint` | Runs `oxlint` with zero errors or warnings |
-| **Frontend Build** | `npm run build` | Runs `tsc -b` type check and Vite production bundle |
-| **Backend Build** | `npm run build --prefix server` | Runs `tsc` to verify backend TypeScript compilation |
+**Demo Mode**
 
----
+- Uses browser local storage.
+- Allows users to explore financial tracking and analysis features.
+- Keeps demo data separate from authenticated database records.
 
-## 6. API Endpoint Contract
+**Authenticated Mode**
 
-All endpoints are prefixed with `/api`. Protected routes require a valid session via `finora_session` HttpOnly cookie or `Authorization: Bearer <token>` header.
-
-### Authentication (`/api/auth`)
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Public (Rate-limited) | Validates email, hashes password with bcrypt, creates account, sets session cookie |
-| `POST` | `/api/auth/login` | Public (Rate-limited) | Authenticates credentials, sets HttpOnly cookie |
-| `POST` | `/api/auth/logout` | Public | Clears `finora_session` cookie |
-| `GET` | `/api/auth/me` | Protected | Returns current authenticated user profile (`id`, `email`, `fullName`) |
-
-### Transactions (`/api/transactions`)
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/transactions` | Protected | Returns all transactions owned by authenticated user, sorted by date descending |
-| `POST` | `/api/transactions` | Protected | Creates a new transaction with validated INR amount, date, type, and category |
-| `POST` | `/api/transactions/batch` | Protected | Batch imports multiple transactions (used by CSV import flow) |
-| `PUT` | `/api/transactions/:id` | Protected | Updates transaction owned by authenticated user |
-| `DELETE` | `/api/transactions/:id` | Protected | Deletes transaction owned by authenticated user |
-| `DELETE` | `/api/transactions` | Protected | Clears all transactions for authenticated user |
-
-### Financial Decisions & Review State (`/api/reviews`)
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/reviews` | Protected | Retrieves user's review records (recurring candidates, anomalies, savings plans) |
-| `POST` | `/api/reviews/sync` | Protected | Synchronizes review state between client and cloud |
-| `POST` | `/api/reviews/recurring` | Protected | Confirms or dismisses a recurring payment candidate |
-| `DELETE` | `/api/reviews/recurring/:key` | Protected | Reinstates an unreviewed recurring payment candidate |
-| `DELETE` | `/api/reviews/recurring` | Protected | Resets recurring payment review decisions |
-| `POST` | `/api/reviews/anomaly` | Protected | Reviews or dismisses a spending anomaly finding |
-| `DELETE` | `/api/reviews/anomaly/:key` | Protected | Reinstates an anomaly finding |
-| `DELETE` | `/api/reviews/anomaly` | Protected | Resets anomaly review decisions |
-| `POST` | `/api/reviews/savings` | Protected | Saves, plans, or dismisses a savings opportunity |
-| `DELETE` | `/api/reviews/savings/:key` | Protected | Reinstates a savings opportunity |
-| `DELETE` | `/api/reviews/savings` | Protected | Resets savings opportunity review decisions |
+- Requires user registration or login.
+- Stores supported financial records in MongoDB Atlas.
+- Maintains user-specific data and review states across sessions.
 
 ---
 
-## 7. Data Storage vs. Client-Derived Intelligence
+## Deployment
 
-To ensure performance, auditability, and immediate responsiveness, Finora cleanly separates persistent raw evidence from derived analytical insights:
+The production application is hosted using the following services:
 
-| Data Layer | Storage Location | Responsibility |
-| :--- | :--- | :--- |
-| **User Identity** | MongoDB (`users` collection) | Authenticated credentials, hashed passwords, profile |
-| **Canonical Ledger** | MongoDB (`transactions` collection) | Concrete financial debits/credits (amount, date, description, type, category) |
-| **User Review Decisions** | MongoDB (`reviewstates` collection) | Explicit user decisions (recurring confirmations, anomaly dismissals, savings targets) |
-| **Cadence & Recurring Detection** | **Client-Derived** (In-Memory) | Deterministic cycle detection computed by `recurringDetection.ts` |
-| **Anomaly Radar Forensics** | **Client-Derived** (In-Memory) | Statistical MAD/Z-Score deviation models computed by `anomalyDetection.ts` |
-| **Savings Opportunity Lab** | **Client-Derived** (In-Memory) | Discretionary category trims and projections computed by `savingsDetection.ts` |
-| **Guest / Demo Mode** | `localStorage` | Isolated preview dataset when unauthenticated (`finora.transactions.v1`) |
+| Service | Platform |
+|---|---|
+| Frontend | Vercel |
+| Backend API | Render |
+| Database | MongoDB Atlas |
+
+The application uses environment-based configuration to separate local development settings from production deployment settings.
 
 ---
 
-## 8. Current Scope & Known Limitations
+## Project Goals
 
-- **Local Development Focus**: Phase 07 focuses exclusively on local development with Node.js, Express, and MongoDB. Production cloud deployment (Render, Atlas, Vercel API) is slated for future phases.
-- **Bank Integrations**: Financial data is input via manual entry or standard bank statement CSV parsing (HDFC, ICICI, SBI). Live Account Aggregator (AA) integrations are intentionally out of scope for Phase 07.
-- **Offline / Demo Resilience**: Users can enter the interactive demo workspace without an account (`/app`). Real user accounts require sign-in to persist to MongoDB.
+Finora was developed to explore how full-stack web technologies can be used to build a practical personal finance application.
+
+The project focuses on:
+
+- Building a complete frontend and backend architecture.
+- Implementing secure authentication and persistent data storage.
+- Developing transaction-based financial analysis.
+- Creating meaningful data visualizations.
+- Designing a clean and accessible user experience.
+- Deploying a full-stack application using cloud hosting services.
+
+---
+
+## Future Improvements
+
+Potential areas for future development include:
+
+- Enhanced financial reports and export options.
+- More advanced spending trend analysis.
+- Improved recurring payment detection.
+- Additional savings analysis and budgeting tools.
+- Expanded financial insights and visualizations.
+
+---
+
+## Live Project
+
+Explore Finora:
+
+**[https://finoratrack.vercel.app/](https://finoratrack.vercel.app/)**
+
+---
+
+*Finora — Your money. Under investigation.*
