@@ -5,25 +5,47 @@ import { User, IUser } from '../models/User.js'
 import { env } from '../config/env.js'
 import type { AuthenticatedRequest } from '../middleware/auth.js'
 
-function setSessionCookie(res: Response, token: string): void {
+function getCookieOptions(): {
+  httpOnly: boolean
+  secure: boolean
+  sameSite: 'none' | 'lax'
+  path: string
+  domain?: string
+} {
   const isProd = env.NODE_ENV === 'production'
-  res.cookie('finora_session', token, {
+  const cookieDomain = process.env.COOKIE_DOMAIN?.trim()
+
+  const options: {
+    httpOnly: boolean
+    secure: boolean
+    sameSite: 'none' | 'lax'
+    path: string
+    domain?: string
+  } = {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? 'none' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    sameSite: cookieDomain ? 'lax' : isProd ? 'none' : 'lax',
     path: '/',
+  }
+
+  if (cookieDomain) {
+    options.domain = cookieDomain
+  }
+
+  return options
+}
+
+function setSessionCookie(res: Response, token: string): void {
+  const options = getCookieOptions()
+  res.cookie('finora_session', token, {
+    ...options,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   })
 }
 
 function clearSessionCookie(res: Response): void {
-  const isProd = env.NODE_ENV === 'production'
-  res.clearCookie('finora_session', {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax',
-    path: '/',
-  })
+  const options = getCookieOptions()
+  res.clearCookie('finora_session', options)
 }
 
 export function generateToken(user: IUser): string {
@@ -160,8 +182,10 @@ export async function getMe(req: AuthenticatedRequest, res: Response, next: Next
       return
     }
 
+    const token = generateToken(user)
     res.status(200).json({
       user: user.toJSON(),
+      token,
     })
   } catch (error) {
     next(error)

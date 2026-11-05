@@ -98,20 +98,36 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     wasAuthenticatedRef.current = true
     let isMounted = true
     queueMicrotask(() => {
-      if (isMounted) setIsLoadingCloudData(true)
+      if (isMounted) {
+        setIsLoadingCloudData(true)
+        setIsCloudSynced(false)
+      }
     })
 
+    let fetchFailed = false
     Promise.all([
-      api.transactions.list().catch(() => ({ transactions: [] })),
-      api.reviews.getReviews().catch(() => ({ recurringReviews: {}, anomalyReviews: {}, savingsReviews: {} })),
+      api.transactions.list().catch((err) => {
+        fetchFailed = true
+        console.error('[Finora API] Failed to fetch user transactions:', err)
+        return { transactions: [] }
+      }),
+      api.reviews.getReviews().catch((err) => {
+        fetchFailed = true
+        console.error('[Finora API] Failed to fetch user reviews:', err)
+        return { recurringReviews: {}, anomalyReviews: {}, savingsReviews: {} }
+      }),
     ])
       .then(([txData, reviewData]) => {
         if (!isMounted) return
-        setTransactions(txData.transactions || [])
-        setRecurringReviews(reviewData.recurringReviews || {})
-        setAnomalyReviews(reviewData.anomalyReviews || {})
-        setSavingsReviews(reviewData.savingsReviews || {})
-        setIsCloudSynced(true)
+        if (!fetchFailed) {
+          setTransactions(txData.transactions || [])
+          setRecurringReviews(reviewData.recurringReviews || {})
+          setAnomalyReviews(reviewData.anomalyReviews || {})
+          setSavingsReviews(reviewData.savingsReviews || {})
+          setIsCloudSynced(true)
+        } else {
+          setIsCloudSynced(false)
+        }
       })
       .finally(() => {
         if (isMounted) setIsLoadingCloudData(false)

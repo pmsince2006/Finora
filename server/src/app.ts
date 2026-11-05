@@ -10,14 +10,24 @@ import { errorHandler } from './middleware/errorHandler.js'
 export const app = express()
 
 // CORS configuration - strict origin with credentials support
+const normalizedAllowedOrigin = env.FRONTEND_ORIGIN.replace(/\/+$/, '')
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (e.g. mobile apps, curl, or same-origin in development)
-      if (!origin || origin === env.FRONTEND_ORIGIN || origin.startsWith('http://localhost:')) {
+      if (!origin) {
+        callback(null, true)
+        return
+      }
+      const normalizedOrigin = origin.replace(/\/+$/, '')
+      if (
+        normalizedOrigin === normalizedAllowedOrigin ||
+        normalizedOrigin.startsWith('http://localhost:')
+      ) {
         callback(null, true)
       } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS policy`))
+        callback(null, false)
       }
     },
     credentials: true,

@@ -5,6 +5,17 @@ import type { SavingsReviewRecord } from './savingsStorage'
 
 const BASE_URL = import.meta.env.VITE_API_URL || ''
 
+// In-memory token storage (held strictly in JavaScript RAM; never written to localStorage)
+let memoryToken: string | null = null
+
+export function setMemoryToken(token: string | null): void {
+  memoryToken = token
+}
+
+export function getMemoryToken(): string | null {
+  return memoryToken
+}
+
 export interface UserProfile {
   id: string
   email: string
@@ -38,6 +49,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers.set('Content-Type', 'application/json')
   }
 
+  // Attach in-memory Bearer token fallback if present and not already provided
+  if (memoryToken && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${memoryToken}`)
+  }
+
   const response = await fetch(url, {
     ...options,
     headers,
@@ -66,29 +82,45 @@ export const api = {
   // Authentication
   auth: {
     async register(fullName: string, email: string, password: string): Promise<AuthResponse> {
-      return request<AuthResponse>('/api/auth/register', {
+      const res = await request<AuthResponse>('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify({ fullName, email, password }),
       })
+      if (res.token) {
+        memoryToken = res.token
+      }
+      return res
     },
 
     async login(email: string, password: string): Promise<AuthResponse> {
-      return request<AuthResponse>('/api/auth/login', {
+      const res = await request<AuthResponse>('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       })
+      if (res.token) {
+        memoryToken = res.token
+      }
+      return res
     },
 
     async logout(): Promise<{ success: boolean; message: string }> {
-      return request<{ success: boolean; message: string }>('/api/auth/logout', {
-        method: 'POST',
-      })
+      try {
+        return await request<{ success: boolean; message: string }>('/api/auth/logout', {
+          method: 'POST',
+        })
+      } finally {
+        memoryToken = null
+      }
     },
 
-    async getMe(): Promise<{ user: UserProfile }> {
-      return request<{ user: UserProfile }>('/api/auth/me', {
+    async getMe(): Promise<{ user: UserProfile; token?: string }> {
+      const res = await request<{ user: UserProfile; token?: string }>('/api/auth/me', {
         method: 'GET',
       })
+      if (res.token) {
+        memoryToken = res.token
+      }
+      return res
     },
   },
 

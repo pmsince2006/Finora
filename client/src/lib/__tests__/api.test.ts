@@ -54,4 +54,95 @@ describe('Client API Service (client/src/lib/api.ts)', () => {
       expect(err.message).toBe('An account with this email already exists.')
     }
   })
+
+  it('attaches in-memory Bearer token fallback without touching localStorage', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ user: { id: 'u-1', email: 'a@b.com', fullName: 'A' }, token: 'jwt.sample.token' }),
+    } as Response)
+
+    // Login stores in-memory token
+    await api.auth.login('a@b.com', 'password123')
+
+    // Next request includes Authorization: Bearer header
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ transactions: [] }),
+    } as Response)
+
+    await api.transactions.list()
+    expect(fetchSpy).toHaveBeenLastCalledWith(
+      '/api/transactions',
+      expect.objectContaining({
+        headers: expect.any(Headers),
+      })
+    )
+    const calledHeaders = fetchSpy.mock.calls[1][1]?.headers as Headers
+    expect(calledHeaders.get('Authorization')).toBe('Bearer jwt.sample.token')
+
+    // Logout clears token
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ success: true }),
+    } as Response)
+    await api.auth.logout()
+
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ user: { id: 'u-1' } }),
+    } as Response)
+    await api.auth.getMe()
+    const finalHeaders = fetchSpy.mock.calls[3][1]?.headers as Headers
+    expect(finalHeaders.get('Authorization')).toBeNull()
+  })
+
+  it('demonstrates refresh failure when third-party cookies are blocked and memory is wiped', async () => {
+    // 1. User logs in, backend returns user and token
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ user: { id: 'u-1', email: 'user@finora.in', fullName: 'User' }, token: 'jwt.active.token' }),
+    } as Response)
+    await api.auth.login('user@finora.in', 'password123')
+
+    // 2. Simulated Page Refresh: JavaScript execution context resets and RAM is cleared
+    // In a real browser reload, module-level memoryToken reverts to null
+    const { setMemoryToken } = await import('../api')
+    setMemoryToken(null)
+
+    // 3. Browser has blocked cross-site cookies, so fetch sends no cookie; server rejects with 401
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ error: 'Authentication required. No session token provided.', code: 'AUTH_REQUIRED' }),
+    } as Response)
+
+    // 4. Verification: getMe fails, triggering logout in AuthContext
+    await expect(api.auth.getMe()).rejects.toThrow(ApiError)
+  })
+
+  it('demonstrates successful session restore across refresh when cookies are supported (custom domain / proxy)', async () => {
+    // 1. Simulated Page Refresh with clean memory
+    const { setMemoryToken, getMemoryToken } = await import('../api')
+    setMemoryToken(null)
+    expect(getMemoryToken()).toBeNull()
+
+    // 2. Browser includes 1st-party / same-site cookie with credentials: 'include'
+    // Server validates cookie and returns authenticated user and fresh token
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ user: { id: 'u-1', email: 'user@finora.in', fullName: 'User' }, token: 'jwt.restored.token' }),
+    } as Response)
+
+    const res = await api.auth.getMe()
+    expect(res.user.email).toBe('user@finora.in')
+    // Token rehydrated into memory
+    expect(getMemoryToken()).toBe('jwt.restored.token')
+  })
 })

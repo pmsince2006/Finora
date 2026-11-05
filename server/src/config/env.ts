@@ -18,6 +18,10 @@ function validateEnv(): ServerConfig {
 
   const NODE_ENV = process.env.NODE_ENV || 'development'
 
+  if (NODE_ENV === 'production' && !process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI environment variable is required in production.')
+  }
+
   const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/finora'
   if (!MONGODB_URI.startsWith('mongodb://') && !MONGODB_URI.startsWith('mongodb+srv://')) {
     throw new Error(`Invalid MONGODB_URI: "${MONGODB_URI}". Must start with mongodb:// or mongodb+srv://.`)
@@ -28,7 +32,7 @@ function validateEnv(): ServerConfig {
     throw new Error('JWT_SECRET environment variable is missing or shorter than 16 characters.')
   }
 
-  const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173'
+  const FRONTEND_ORIGIN = (process.env.FRONTEND_ORIGIN || 'http://localhost:5173').replace(/\/+$/, '')
 
   return {
     PORT,

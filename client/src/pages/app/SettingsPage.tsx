@@ -7,11 +7,13 @@ import {
   X,
 } from 'lucide-react'
 import { useFinance } from '../../context/useFinance'
+import { useAuth } from '../../context/useAuth'
 import { useToast } from '../../context/useToast'
 import { STORAGE_KEY } from '../../lib/transactionStorage'
 import type { PeriodFilter } from '../../types/finance'
 
 export const SettingsPage: React.FC = () => {
+  const { isAuthenticated, user } = useAuth()
   const { period, setPeriod, resetToDemo, transactions } = useFinance()
   const { showToast } = useToast()
 
@@ -28,17 +30,26 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Honest Local-First Notice */}
+      {/* Storage Model Notice */}
       <div className="p-4 rounded-2xl bg-[#F2F7F4] border border-[#C2D3CC] text-xs text-[#1B4332] flex items-start gap-3">
         <Database className="w-5 h-5 text-[#2D6A4F] shrink-0 mt-0.5" />
         <div>
           <strong className="font-semibold block text-[#0E241B]">
-            Browser-Local Storage Model
+            {isAuthenticated ? 'Authenticated Cloud Storage Model' : 'Browser-Local Storage Model'}
           </strong>
           <p className="text-[11px] text-[#35423B] mt-0.5 leading-relaxed">
-            Finora saves transactions directly inside your browser cache under the namespaced key{' '}
-            <code className="font-mono bg-[#E3ECE8] px-1 py-0.5 rounded text-[#153326]">{STORAGE_KEY}</code>.
-            Your transactions persist across tab reloads and browser restarts on this machine. No financial data, account statements, or passwords leave your browser.
+            {isAuthenticated ? (
+              <>
+                Signed in as <strong className="text-[#16201B]">{user?.fullName || 'User'}</strong> ({user?.email}).
+                All transaction records, cadence matches, and savings plans are securely isolated and persisted in your MongoDB Atlas cloud database.
+              </>
+            ) : (
+              <>
+                Finora saves transactions directly inside your browser cache under the namespaced key{' '}
+                <code className="font-mono bg-[#E3ECE8] px-1 py-0.5 rounded text-[#153326]">{STORAGE_KEY}</code>.
+                Your transactions persist across tab reloads and browser restarts on this machine. No financial data leaves your browser.
+              </>
+            )}
           </p>
         </div>
       </div>

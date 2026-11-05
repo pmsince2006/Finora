@@ -92,6 +92,21 @@ describe('Backend Auth API (/api/auth)', () => {
 
     expect(meRes.status).toBe(200)
     expect(meRes.body.user.email).toBe('rohan.sharma@example.com')
+    expect(meRes.body.token).toBeDefined()
+  })
+
+  it('authenticates via Authorization: Bearer header when cookie is absent', async () => {
+    const regRes = await request(app).post('/api/auth/register').send(validUser)
+    const token = regRes.body.token
+    expect(token).toBeDefined()
+
+    // Request WITHOUT any Cookie header, only Authorization: Bearer
+    const meRes = await request(app)
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(meRes.status).toBe(200)
+    expect(meRes.body.user.email).toBe('rohan.sharma@example.com')
   })
 
   it('rejects /api/auth/me when session cookie is absent or invalid', async () => {

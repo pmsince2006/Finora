@@ -15,6 +15,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { useFinance } from '../../context/useFinance'
+import { useAuth } from '../../context/useAuth'
 import { useToast } from '../../context/useToast'
 import { formatCurrency } from '../../lib/formatCurrency'
 import { DeleteConfirmModal } from '../../components/app/DeleteConfirmModal'
@@ -24,6 +25,7 @@ type SortColumn = 'date' | 'description' | 'category' | 'amount'
 type SortDirection = 'asc' | 'desc'
 
 export const TransactionsPage: React.FC = () => {
+  const { isAuthenticated } = useAuth()
   const {
     filteredTransactions,
     transactions,
@@ -201,7 +203,15 @@ export const TransactionsPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <Database className="w-4 h-4 text-[#2D6A4F] shrink-0" />
           <span className="text-[11px] text-[#35423B]">
-            <strong>Local Storage Active:</strong> Changes are saved to your browser cache (`finora.transactions.v1`). You can edit, delete, or import records safely without cloud credentials.
+            {isAuthenticated ? (
+              <>
+                <strong>Cloud Database Active:</strong> Changes are synchronized with your authenticated account in MongoDB Atlas. Your transactions persist across all devices.
+              </>
+            ) : (
+              <>
+                <strong>Local Storage Active:</strong> Changes are saved to your browser cache (`finora.transactions.v1`). You can edit, delete, or import records safely without cloud credentials.
+              </>
+            )}
           </span>
         </div>
         <Link
