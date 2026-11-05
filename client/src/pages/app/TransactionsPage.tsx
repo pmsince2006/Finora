@@ -2,9 +2,6 @@ import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Search,
-  Plus,
-  ArrowLeft,
-  UploadCloud,
   Edit2,
   Trash2,
   ArrowUpDown,
@@ -30,11 +27,9 @@ export const TransactionsPage: React.FC = () => {
   const {
     filteredTransactions,
     transactions,
-    openAddTxModal,
     openEditTxModal,
     deleteTransaction,
     undoDelete,
-    openImportModal,
   } = useFinance()
   const { showToast, showUndoToast } = useToast()
 
@@ -201,48 +196,6 @@ export const TransactionsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Back Link & Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E6E6DF]">
-        <div>
-          <Link
-            to="/app"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#52796F] hover:text-[#153326] transition-colors mb-2"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Overview</span>
-          </Link>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-serif font-medium text-[#16201B]">
-              Money Ledger
-            </h1>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E3ECE8] text-[#153326] font-medium">
-              PHASE 03 ACTIVE
-            </span>
-          </div>
-          <p className="text-xs text-[#62726A] mt-0.5">
-            Canonical transaction ledger with browser-local persistence, multi-column sorting, and CSV statement ingestion.
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 self-start sm:self-auto">
-          <button
-            onClick={openImportModal}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-[#C2D3CC] bg-[#FFFFFF] hover:bg-[#F2F7F4] text-[#153326] text-xs font-medium transition-colors shadow-2xs cursor-pointer"
-          >
-            <UploadCloud className="w-4 h-4 text-[#2D6A4F]" />
-            <span>Import CSV</span>
-          </button>
-          <button
-            onClick={openAddTxModal}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#153326] hover:bg-[#1B4332] text-[#F2F7F4] text-xs font-medium transition-colors shadow-xs cursor-pointer"
-          >
-            <Plus className="w-4 h-4 text-[#9DB4AC]" />
-            <span>Add Transaction</span>
-          </button>
-        </div>
-      </div>
-
       {/* Storage Notification Banner */}
       <div className="p-3.5 rounded-2xl bg-[#F2F7F4] border border-[#C2D3CC] text-xs text-[#1B4332] flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">

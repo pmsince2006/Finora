@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ArrowLeft,
   Sparkles,
   ShieldCheck,
   CheckCircle2,
@@ -174,30 +173,6 @@ export const SavingsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* SECTION A: Page Introduction & Context Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E6E6DF]">
-        <div>
-          <Link
-            to="/app"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#52796F] hover:text-[#153326] transition-colors mb-2 cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Overview</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-serif font-medium text-[#16201B]">
-              Savings Opportunity Lab
-            </h1>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#153326] text-[#FFFFFF]">
-              PHASE 06 ACTIVE
-            </span>
-          </div>
-          <p className="text-xs text-[#62726A] mt-0.5">
-            Data-backed opportunities to optimize discretionary outflows and plan realistic monthly savings cushions.
-          </p>
-        </div>
-      </div>
-
       {/* Honest Distinction Banner: Potential vs Realized Savings */}
       <div className="p-4 rounded-2xl bg-[#F2F7F4] border border-[#C2D3CC] text-xs text-[#1B4332] flex items-start gap-3">
         <Sparkles className="w-5 h-5 text-[#2D6A4F] shrink-0 mt-0.5" />

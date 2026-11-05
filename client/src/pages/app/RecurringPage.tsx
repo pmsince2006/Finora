@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Repeat,
-  ArrowLeft,
   CheckCircle2,
   XCircle,
   RotateCcw,
@@ -145,40 +144,16 @@ export const RecurringPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E6E6DF]">
-        <div>
-          <Link
-            to="/app"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#52796F] hover:text-[#153326] transition-colors mb-2"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Overview</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-serif font-medium text-[#16201B]">
-              Recurring Payment Detective
-            </h1>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E3ECE8] text-[#153326]">
-              {summary.candidateCount} ACTIVE OBLIGATIONS
-            </span>
-          </div>
-          <p className="text-xs text-[#62726A] mt-0.5">
-            Deterministic cadence matcher analyzing canonical transaction intervals, billing frequencies, and subscription run-rates.
-          </p>
-        </div>
-      </div>
-
       {/* Engine Status Banner */}
       <div className="p-4 rounded-2xl bg-[#F2F7F4] border border-[#C2D3CC] text-xs text-[#1B4332] flex items-start gap-3">
         <Zap className="w-5 h-5 text-[#2D6A4F] shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <strong className="font-semibold text-[#0E241B]">
               Real-Time Ledger Intelligence Active
             </strong>
-            <span className="text-[10px] font-mono bg-[#E3ECE8] text-[#153326] px-1.5 py-0.5 rounded">
-              Phase 04 Production Engine
+            <span className="text-[10px] font-mono bg-[#E3ECE8] text-[#153326] px-2 py-0.5 rounded font-medium">
+              {summary.candidateCount} ACTIVE OBLIGATIONS
             </span>
           </div>
           <p className="text-[11px] text-[#35423B] leading-relaxed">

@@ -6,6 +6,8 @@ import {
   PiggyBank,
   CheckCircle2,
   ArrowRight,
+  ArrowUpRight,
+  ArrowDownRight,
   Check,
   ChevronRight,
 } from 'lucide-react'
@@ -178,38 +180,128 @@ export const FeatureShowcase: React.FC = () => {
           {/* Right: Live Interactive Card for the Selected Feature */}
           <div className="lg:col-span-6">
             {activeFeatureIndex === 0 && (
-              /* Feature 1 Preview: Money Ledger Ingestion & Dedup */
-              <div className="p-6 rounded-2xl bg-[#FBFBFA] border border-[#E6E6DF] shadow-xs space-y-4">
+              /* Feature 1 Preview: Personal Money Ledger */
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FBFBFA] border border-[#E6E6DF] shadow-xs space-y-4">
+                {/* Header */}
                 <div className="flex items-center justify-between pb-3 border-b border-[#E6E6DF]">
-                  <span className="text-xs font-semibold text-[#16201B]">CSV File Import</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E3ECE8] text-[#153326]">
-                    READY TO IMPORT
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#10b981]" />
+                    <span className="text-xs font-semibold text-[#16201B]">Monthly Cash Flow &amp; Ledger</span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E3ECE8] text-[#153326] font-medium">
+                    APRIL 2026 // LIVE
                   </span>
                 </div>
 
-                <div className="space-y-2 font-mono text-[11px]">
-                  <div className="p-2.5 rounded-lg bg-white border border-[#E6E6DF] flex items-center justify-between">
-                    <span className="text-[#62726A]">Header: [Transaction Date]</span>
-                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ date</span>
+                {/* Cash-Flow Summary Strip */}
+                <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-center">
+                  <div>
+                    <div className="text-[10px] font-mono uppercase text-[#52796F]">Inflow</div>
+                    <div className="text-xs sm:text-sm font-mono font-semibold text-[#166534] mt-0.5">
+                      +₹45,000
+                    </div>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-white border border-[#E6E6DF] flex items-center justify-between">
-                    <span className="text-[#62726A]">Header: [Merchant or Note]</span>
-                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ description</span>
+                  <div className="border-x border-[#E6E6DF]">
+                    <div className="text-[10px] font-mono uppercase text-[#788780]">Outflow</div>
+                    <div className="text-xs sm:text-sm font-mono font-semibold text-[#35423B] mt-0.5">
+                      -₹24,350
+                    </div>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-white border border-[#E6E6DF] flex items-center justify-between">
-                    <span className="text-[#62726A]">Header: [Amount (₹ INR)]</span>
-                    <span className="text-[#153326] font-bold">Mapped $\rightarrow$ amount (₹)</span>
+                  <div>
+                    <div className="text-[10px] font-mono uppercase text-[#52796F]">Net Cashflow</div>
+                    <div className="text-xs sm:text-sm font-mono font-semibold text-[#153326] mt-0.5">
+                      +₹20,650
+                    </div>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#F2F7F4] border border-[#C2D3CC] text-xs text-[#153326]">
-                  <div className="font-semibold flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#2D6A4F]" />
-                    <span>Automatic Duplicate Detection</span>
+                {/* Ledger Entries List */}
+                <div className="space-y-2">
+                  <div className="p-2.5 rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] flex items-center justify-between hover:border-[#CBD5D0] transition-colors">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-[#DCFCE7] text-[#15803D] flex items-center justify-center shrink-0">
+                        <ArrowUpRight className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-medium text-[#16201B] truncate">
+                          Software Engineering Stipend
+                        </div>
+                        <div className="text-[10px] text-[#62726A] truncate">
+                          Apex Labs Tech • Direct Deposit
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-xs font-mono font-bold text-[#166534]">+₹40,000</span>
+                      <span className="block text-[9px] font-mono uppercase text-[#52796F]">Income</span>
+                    </div>
                   </div>
-                  <p className="text-[11px] text-[#4B5952] mt-1">
-                    Finora checks dates, amounts, and descriptions to ensure no transaction is imported twice.
-                  </p>
+
+                  <div className="p-2.5 rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] flex items-center justify-between hover:border-[#CBD5D0] transition-colors">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-[#F5F5F0] text-[#35423B] flex items-center justify-center shrink-0">
+                        <ArrowDownRight className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-medium text-[#16201B] truncate">
+                          Apartment Rent &amp; Maintenance
+                        </div>
+                        <div className="text-[10px] text-[#62726A] truncate">
+                          Urban Spaces • Housing
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-xs font-mono font-bold text-[#16201B]">-₹12,500</span>
+                      <span className="block text-[9px] font-mono uppercase text-[#788780]">Housing</span>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] flex items-center justify-between hover:border-[#CBD5D0] transition-colors">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-[#F5F5F0] text-[#35423B] flex items-center justify-center shrink-0">
+                        <ArrowDownRight className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-medium text-[#16201B] truncate">
+                          Third Wave Coffee Roasters
+                        </div>
+                        <div className="text-[10px] text-[#62726A] truncate">
+                          Cold brew &amp; study • Dining
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-xs font-mono font-bold text-[#16201B]">-₹380</span>
+                      <span className="block text-[9px] font-mono uppercase text-[#788780]">Dining</span>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] flex items-center justify-between hover:border-[#CBD5D0] transition-colors">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-[#DCFCE7] text-[#15803D] flex items-center justify-center shrink-0">
+                        <ArrowUpRight className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-medium text-[#16201B] truncate">
+                          Freelance Design Sprint
+                        </div>
+                        <div className="text-[10px] text-[#62726A] truncate">
+                          Campus Studio • Client Credit
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-xs font-mono font-bold text-[#166534]">+₹5,000</span>
+                      <span className="block text-[9px] font-mono uppercase text-[#52796F]">Income</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Subtitle indicator footer */}
+                <div className="p-2.5 rounded-xl bg-[#F2F7F4] border border-[#C2D3CC] flex items-center gap-2 text-[11px] text-[#153326]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#2D6A4F] shrink-0" />
+                  <span>Clear view of all money in and money out • No double-counting</span>
                 </div>
               </div>
             )}

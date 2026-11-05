@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
-  ArrowLeft,
   RotateCcw,
   CheckCircle2,
   Database,
@@ -30,28 +28,6 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Back Link & Header */}
-      <div className="pb-4 border-b border-[#E6E6DF]">
-        <Link
-          to="/app"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#52796F] hover:text-[#153326] transition-colors mb-2"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Overview</span>
-        </Link>
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-serif font-medium text-[#16201B]">
-            Application Preferences
-          </h1>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E3ECE8] text-[#153326]">
-            BROWSER LOCAL
-          </span>
-        </div>
-        <p className="text-xs text-[#62726A] mt-0.5">
-          Configure interface behavior, reporting windows, and browser-local transaction storage.
-        </p>
-      </div>
-
       {/* Honest Local-First Notice */}
       <div className="p-4 rounded-2xl bg-[#F2F7F4] border border-[#C2D3CC] text-xs text-[#1B4332] flex items-start gap-3">
         <Database className="w-5 h-5 text-[#2D6A4F] shrink-0 mt-0.5" />

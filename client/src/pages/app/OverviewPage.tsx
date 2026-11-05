@@ -9,7 +9,6 @@ import {
   PiggyBank,
   ArrowRight,
   Plus,
-  UploadCloud,
   Layers,
   ArrowUpRight,
   ArrowDownRight,
@@ -29,6 +28,7 @@ import {
   ComposedChart,
 } from 'recharts'
 import { useFinance } from '../../context/useFinance'
+import { useAuth } from '../../context/useAuth'
 import { formatCurrency, formatPercent } from '../../lib/formatCurrency'
 
 interface TooltipPayloadItem {
@@ -72,6 +72,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
 
 export const OverviewPage: React.FC = () => {
   const navigate = useNavigate()
+  const { user, isAuthenticated } = useAuth()
   const {
     filteredTransactions,
     metrics,
@@ -82,7 +83,6 @@ export const OverviewPage: React.FC = () => {
     savingsSummary,
     period,
     openAddTxModal,
-    openImportModal,
   } = useFinance()
 
   const containerVariants: Variants = {
@@ -105,8 +105,6 @@ export const OverviewPage: React.FC = () => {
   // Slice recent 6 transactions for overview table
   const recentTransactions = filteredTransactions.slice(0, 6)
 
-
-
   return (
     <motion.div
       variants={containerVariants}
@@ -119,17 +117,32 @@ export const OverviewPage: React.FC = () => {
         variants={cardVariants}
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#E6E6DF]/80 text-xs text-[#62726A]"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="font-mono text-[#153326] font-semibold tracking-wider">
             [FINORA LAB // CASE #4029]
           </span>
           <span className="text-[#D4D4CA]">•</span>
-          <span>Subject: Alex Morrison (SWE Intern &amp; Graduate Student)</span>
+          <span>
+            Subject:{' '}
+            {isAuthenticated && user
+              ? `${user.fullName || 'User'} (${user.email})`
+              : 'Demo Profile (Sample Ledger)'}
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-[#2D6A4F]" />
-          <span className="font-mono text-[11px] text-[#2D6A4F]">
-            ILLUSTRATIVE DEMO DATASET (INR ₹)
+        <div className="flex items-center gap-2 shrink-0">
+          <span
+            className={`inline-block w-2 h-2 rounded-full ${
+              isAuthenticated ? 'bg-[#10B981]' : 'bg-[#D97706]'
+            }`}
+          />
+          <span
+            className={`font-mono text-[11px] font-medium ${
+              isAuthenticated ? 'text-[#047857]' : 'text-[#B45309]'
+            }`}
+          >
+            {isAuthenticated
+              ? 'SECURE USER LEDGER (INR ₹)'
+              : 'ILLUSTRATIVE DEMO DATASET (INR ₹)'}
           </span>
         </div>
       </motion.div>
@@ -655,43 +668,29 @@ export const OverviewPage: React.FC = () => {
             <div>
               <span className="font-semibold text-[#0E241B] block">Quick Forensic Operations</span>
               <span className="text-[11px] text-[#62726A]">
-                Execute real-time ledger updates or launch focused module investigations.
+                Launch focused module investigations or inspect full transaction records.
               </span>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
             <button
-              onClick={openAddTxModal}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-xl bg-[#153326] text-[#F2F7F4] hover:bg-[#1B4332] transition-colors shadow-xs"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Transaction</span>
-            </button>
-            <button
-              onClick={openImportModal}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#16201B] hover:bg-[#FBFBFA] transition-colors"
-            >
-              <UploadCloud className="w-3.5 h-3.5 text-[#52796F]" />
-              <span>Import CSV</span>
-            </button>
-            <button
               onClick={() => navigate('/app/transactions')}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#16201B] hover:bg-[#FBFBFA] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#16201B] hover:bg-[#FBFBFA] hover:border-[#D4D4CA] transition-colors shadow-2xs cursor-pointer"
             >
-              <Receipt className="w-3.5 h-3.5 text-[#788780]" />
-              <span>View Ledger</span>
+              <Receipt className="w-3.5 h-3.5 text-[#52796F]" />
+              <span>View Full Ledger</span>
             </button>
             <button
               onClick={() => navigate('/app/investigations')}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#C97A2B] hover:bg-[#FBFBFA] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#C97A2B] hover:bg-[#FBFBFA] hover:border-[#D4D4CA] transition-colors shadow-2xs cursor-pointer"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-[#C97A2B]" />
-              <span>Radar</span>
+              <span>Spending Radar</span>
             </button>
             <button
               onClick={() => navigate('/app/savings')}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#2D6A4F] hover:bg-[#FBFBFA] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl bg-[#FFFFFF] border border-[#E6E6DF] text-[#2D6A4F] hover:bg-[#FBFBFA] hover:border-[#D4D4CA] transition-colors shadow-2xs cursor-pointer"
             >
               <PiggyBank className="w-3.5 h-3.5 text-[#2D6A4F]" />
               <span>Savings Lab</span>

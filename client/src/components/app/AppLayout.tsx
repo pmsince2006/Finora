@@ -69,17 +69,19 @@ export const AppLayout: React.FC = () => {
     switch (location.pathname) {
       case '/app/transactions':
         return {
-          title: 'Money Ledger & Transactions',
+          title: 'Money Ledger',
           subtitle: 'Audit, categorize, and verify all personal monetary inflows and outflows.',
           showPeriod: true,
           showAdd: true,
+          showImport: true,
         }
       case '/app/recurring':
         return {
           title: 'Recurring Payment Detective',
           subtitle: 'Cadence-based pattern engine identifying subscriptions and hidden fees.',
           showPeriod: false,
-          showAdd: true,
+          showAdd: false,
+          showImport: false,
         }
       case '/app/investigations':
         return {
@@ -87,6 +89,7 @@ export const AppLayout: React.FC = () => {
           subtitle: 'Statistical deviation models exposing irregular spikes and category outliers.',
           showPeriod: false,
           showAdd: false,
+          showImport: false,
         }
       case '/app/savings':
         return {
@@ -94,6 +97,7 @@ export const AppLayout: React.FC = () => {
           subtitle: 'Simulate high-impact behavioral adjustments and calculate compound savings.',
           showPeriod: false,
           showAdd: false,
+          showImport: false,
         }
       case '/app/settings':
         return {
@@ -101,6 +105,7 @@ export const AppLayout: React.FC = () => {
           subtitle: 'Configure currency formatting, default view windows, and local cache controls.',
           showPeriod: false,
           showAdd: false,
+          showImport: false,
         }
       case '/app':
       default:
@@ -109,6 +114,7 @@ export const AppLayout: React.FC = () => {
           subtitle: 'An evidence-led view of where your money goes and what deserves a closer look.',
           showPeriod: true,
           showAdd: true,
+          showImport: true,
         }
     }
   }
@@ -191,8 +197,12 @@ export const AppLayout: React.FC = () => {
           <div className="p-2.5 rounded-xl bg-[#F2F7F4] border border-[#C2D3CC] flex items-center gap-2">
             <ShieldAlert className="w-3.5 h-3.5 text-[#2D6A4F] shrink-0" />
             <div className="text-[10px] font-mono text-[#153326] leading-tight">
-              <span className="font-semibold block">ILLUSTRATIVE DEMO</span>
-              <span className="text-[#52796F]">In-memory forensic dataset</span>
+              <span className="font-semibold block">
+                {isAuthenticated ? 'SECURE USER LEDGER' : 'ILLUSTRATIVE DEMO'}
+              </span>
+              <span className="text-[#52796F]">
+                {isAuthenticated ? 'Persistent Database Cloud' : 'In-memory forensic dataset'}
+              </span>
             </div>
           </div>
 
@@ -200,14 +210,23 @@ export const AppLayout: React.FC = () => {
           <div className="p-3 rounded-xl bg-[#FBFBFA] border border-[#E6E6DF] flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-full bg-[#153326] text-[#E3ECE8] flex items-center justify-center font-serif text-xs font-medium shrink-0">
-                {user ? user.fullName.slice(0, 2).toUpperCase() : 'AM'}
+                {user?.fullName
+                  ? user.fullName
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase()
+                  : user?.email
+                    ? user.email.slice(0, 2).toUpperCase()
+                    : 'DA'}
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-medium text-[#16201B] truncate">
-                  {user ? user.fullName : 'Alex Morrison'}
+                  {user?.fullName || (user?.email ? user.email.split('@')[0] : 'Demo Account')}
                 </div>
                 <div className="text-[10px] text-[#62726A] truncate">
-                  {user ? user.email : 'Local Demo Account'}
+                  {user ? user.email : 'Local Demo Profile'}
                 </div>
               </div>
             </div>
@@ -323,21 +342,40 @@ export const AppLayout: React.FC = () => {
 
             <div className="pt-4 border-t border-[#E6E6DF] space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-[#62726A]">Alex Morrison</span>
-                <button
-                  onClick={() => {
-                    resetToDemo()
-                    setMobileMenuOpen(false)
-                  }}
-                  className="text-[11px] font-mono text-[#52796F] hover:underline"
-                >
-                  Reset demo
-                </button>
+                <div className="flex flex-col min-w-0 pr-2">
+                  <span className="text-xs font-medium text-[#16201B] truncate">
+                    {user?.fullName || (user?.email ? user.email.split('@')[0] : 'Demo Account')}
+                  </span>
+                  <span className="text-[10px] font-mono text-[#62726A] truncate">
+                    {user ? user.email : 'Local Demo Profile'}
+                  </span>
+                </div>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => {
+                      logout()
+                      setMobileMenuOpen(false)
+                    }}
+                    className="text-[11px] font-mono text-[#DC2626] hover:underline shrink-0"
+                  >
+                    Sign out
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      resetToDemo()
+                      setMobileMenuOpen(false)
+                    }}
+                    className="text-[11px] font-mono text-[#52796F] hover:underline shrink-0"
+                  >
+                    Reset demo
+                  </button>
+                )}
               </div>
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-center py-2 text-xs font-medium text-[#153326] bg-[#F2F7F4] rounded-xl"
+                className="block text-center py-2 text-xs font-medium text-[#153326] bg-[#F2F7F4] rounded-xl hover:bg-[#E3ECE8] transition-colors"
               >
                 Return to Landing Page
               </Link>
@@ -392,13 +430,15 @@ export const AppLayout: React.FC = () => {
             )}
 
             {/* Import CSV Trigger */}
-            <button
-              onClick={openImportModal}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-xl border border-[#E6E6DF] bg-[#FFFFFF] text-[#35423B] hover:bg-[#F5F5F0] hover:border-[#D4D4CA] transition-colors shadow-2xs"
-            >
-              <UploadCloud className="w-3.5 h-3.5 text-[#52796F]" />
-              <span className="hidden sm:inline">Import CSV</span>
-            </button>
+            {headerMeta.showImport && (
+              <button
+                onClick={openImportModal}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-xl border border-[#E6E6DF] bg-[#FFFFFF] text-[#35423B] hover:bg-[#F5F5F0] hover:border-[#D4D4CA] transition-colors shadow-2xs cursor-pointer"
+              >
+                <UploadCloud className="w-3.5 h-3.5 text-[#52796F]" />
+                <span className="hidden sm:inline">Import CSV</span>
+              </button>
+            )}
 
             {/* Add Transaction Primary CTA */}
             {headerMeta.showAdd && (
